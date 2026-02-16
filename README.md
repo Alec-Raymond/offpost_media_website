@@ -1,84 +1,32 @@
-# Outpost Media — Surf Photography Website
+# OFFPOST MEDIA
 
-## Quick Start
+A cinematic surf photography experience featuring high-impact visual storytelling and a raw, editorial aesthetic.
 
-1. **Add your media assets:**
-   - Place hero video as `assets/video/hero-clip.mp4` and `assets/video/hero-clip.webm`
-   - Place projector sound effect as `assets/audio/projector.mp3`
-   - Place 2-3 intro flash images in `assets/images/intro/` (named `flash1.avif`, `flash2.avif`, `flash3.avif`)
+## Features
 
-2. **Process portfolio images:**
-   ```bash
-   chmod +x scripts/process-images.sh
-   ./scripts/process-images.sh path/to/your/raw-photos
-   ```
+- **Cinematic Intro:** A structured collage sequence that surges into a high-quality 4K hero video.
+- **Horizontal Narrative:** A smooth, physics-based horizontal scroll experience that mimics an editorial magazine layout.
+- **Staggered Grids:** Dynamic, asymmetric photo grids with clean black framing.
+- **Interactive Contact:** An integrated contact section with autoscroll functionality for instant access.
+- **Atmospheric Effects:** Custom frost grain overlays and film-negative transitions for a raw, tactile feel.
 
-3. **Edit the portfolio:**
-   Open `portfolio-config.json` and add/remove/reorder images.
+## Tech Stack
 
-4. **Serve locally:**
-   ```bash
-   python3 -m http.server 8000
-   ```
-   Then open http://localhost:8000
+- **Frontend:** Vanilla HTML5, CSS3 (Custom Variables, Flexbox, Grid), and JavaScript (ES6 Modules).
+- **Physics:** Custom-built smooth scroll and skew physics engine.
+- **Performance:** Multi-format image support (AVIF, WebP, JPG) with intelligent lazy loading and intersection observers.
 
-## Portfolio Configuration
+## Local Development
 
-Edit `portfolio-config.json` to manage the portfolio grid. Each image entry has:
+To run the project locally:
 
-| Field  | Description | Options |
-|--------|-------------|---------|
-| `src`  | Filename without extension (must match files in `assets/images/`) | e.g. `"surf-01"` |
-| `alt`  | Description of the photo | Any text |
-| `size` | Grid size of the photo | `"small"` (1/3 width), `"medium"` (1/2 width), `"large"` (2/3 width), `"full-width"` (full width) |
+1. Clone the repository.
+2. Serve the directory using a local server (e.g., `python3 -m http.server 8000`).
+3. Open `http://localhost:8000` in your browser.
 
-### Example
+## Deployment
 
-```json
-{
-  "src": "pipeline-barrel",
-  "alt": "Pipeline barrel at sunrise",
-  "size": "large"
-}
-```
+This site is optimized for static hosting platforms like GitHub Pages, Netlify, or Vercel.
 
-### Adding a New Section
-
-Add a new object to the `sections` array:
-
-```json
-{
-  "heading": "SECTION TITLE",
-  "layout": "masonry",
-  "images": [
-    { "src": "filename", "alt": "description", "size": "medium" }
-  ]
-}
-```
-
-## File Structure
-
-```
-assets/
-├── video/          Hero video clip (MP4 + WebM, keep under 6 seconds)
-├── audio/          Projector sound effect (MP3)
-└── images/
-    ├── intro/      2-3 images for the film reel startup flash
-    ├── full/       Full resolution (auto-generated, ~2400px wide)
-    ├── medium/     Medium resolution (auto-generated, ~1200px wide)
-    └── thumbs/     Thumbnails (auto-generated, ~300px wide)
-```
-
-## Requirements for Image Processing
-
-```bash
-brew install imagemagick webp libavif
-```
-
-## Customization
-
-- **Fonts:** Oswald (display) + Roboto (body) via Google Fonts
-- **Colors:** Edit CSS variables in `css/main.css` (`:root` block)
-- **Scroll feel:** Adjust physics in `js/scroll_physics.js` (`friction`, `skewFactor`, `sensitivity`, `lerp`)
-- **Grain intensity:** Adjust `opacity` on `#noise-overlay` in `css/noise.css`
-- **Contact form:** Replace `YOUR_ID` in the form action with your [Formspree](https://formspree.io) endpoint
+---
+© 2026 OFFPOST MEDIA. All rights reserved.
