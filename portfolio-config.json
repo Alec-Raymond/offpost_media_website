@@ -1,0 +1,34 @@
+{
+  "title": "Portfolio — Outpost Media",
+  "sections": [
+    {
+      "heading": "OFFPOST SELECTION",
+      "layout": "masonry",
+      "images": [
+        { "src": "dsc03007", "alt": "Surf photography 1", "size": "large" },
+        { "src": "dsc03224", "alt": "Surf photography 2", "size": "small" },
+        { "src": "dsc03376", "alt": "Surf photography 3", "size": "medium" },
+        { "src": "dsc03417", "alt": "Surf photography 4", "size": "small" },
+        { "src": "img_6638", "alt": "Surf photography 5", "size": "large" },
+        { "src": "img_6643", "alt": "Surf photography 6", "size": "medium" },
+        { "src": "img_6798", "alt": "Surf photography 7", "size": "medium" },
+        { "src": "img_6801", "alt": "Surf photography 8", "size": "small" },
+        { "src": "img_6802", "alt": "Surf photography 9", "size": "large" },
+        { "src": "img_6806", "alt": "Surf photography 10", "size": "medium" },
+        { "src": "img_6807", "alt": "Surf photography 11", "size": "small" },
+        { "src": "img_6889", "alt": "Surf photography 12", "size": "medium" }
+      ]
+    },
+    {
+      "heading": "SESSION B",
+      "layout": "grid-3",
+      "images": [
+        { "src": "img_6900", "alt": "Surf photography 13", "size": "full-width" },
+        { "src": "img_6903", "alt": "Surf photography 14", "size": "medium" },
+        { "src": "img_6960", "alt": "Surf photography 15", "size": "medium" },
+        { "src": "img_6967", "alt": "Surf photography 16", "size": "small" },
+        { "src": "img_6969", "alt": "Surf photography 17", "size": "large" }
+      ]
+    }
+  ]
+}

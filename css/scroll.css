@@ -1,0 +1,304 @@
+/* Disable scroll until intro completes */
+body {
+  overflow: hidden;
+  margin: 0;
+  background: #0a0a0a;
+}
+body.scroll-enabled {
+  overflow: hidden; /* still hidden — we handle scroll manually */
+}
+
+#scroll-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
+
+#scroll-track {
+  display: flex;
+  height: 100vh;
+  will-change: transform;
+}
+
+.panel {
+  flex-shrink: 0;
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+  overflow: hidden;
+}
+
+.panel--hero video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.panel__overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.panel--photo {
+  width: 80vw;
+}
+
+.panel--photo picture {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.panel--photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  will-change: transform;
+}
+
+.panel--portrait {
+  width: 35vw !important;
+  margin-left: 4px;
+}
+
+.panel--cta {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+}
+
+.panel--cta h2 {
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 4vw, 3rem);
+  letter-spacing: 0.2em;
+  text-align: center;
+  margin: 0 0 1rem;
+}
+
+.panel__caption {
+  position: absolute;
+  bottom: 8vh;
+  left: 5vw;
+  color: #fff;
+  font-family: 'Oswald', sans-serif;
+  text-transform: uppercase;
+}
+
+.panel__caption .caption__number {
+  font-family: 'Roboto', sans-serif;
+  font-weight: 300;
+  font-size: 0.75rem;
+  letter-spacing: 0.3em;
+  display: block;
+  margin-bottom: 0.5rem;
+  opacity: 0.6;
+}
+
+.panel__caption h2 {
+  font-size: clamp(2rem, 5vw, 4rem);
+  font-weight: 700;
+  line-height: 1;
+  margin: 0;
+}
+
+.panel__caption p {
+  font-family: 'Roboto', sans-serif;
+  font-weight: 300;
+  font-size: 0.9rem;
+  letter-spacing: 0.15em;
+  margin-top: 0.5rem;
+  opacity: 0.7;
+}
+
+/* 3-Photo Grid (1 Top, 2 Bottom) */
+.panel--grid-1-2 {
+  width: 80vw !important;
+  height: 100vh !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 4px; /* 4px gap between top and bottom */
+  background: #000;
+  padding: 0;
+  overflow: hidden;
+  margin-left: 4px;
+}
+
+.row-top {
+  height: 60%;
+  width: 100%;
+}
+
+.row-bottom {
+  height: 40%;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  gap: 4px; /* 4px gap between the two bottom photos */
+}
+
+.row-bottom .grid-item {
+  flex: 1; /* Equal split of the 100% width */
+  height: 100%;
+}
+
+.panel--grid-1-2 .grid-item {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+  background: #111;
+}
+
+.panel--grid-1-2 img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Contact Panel Section */
+.panel--contact {
+  width: 35vw !important;
+  background: var(--color-bg);
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  padding: 5vh 2vw;
+}
+
+.contact-content {
+  width: 100%;
+  max-width: 600px;
+  text-align: center;
+}
+
+.contact-content h2 {
+  font-family: var(--font-display);
+  font-size: clamp(2.5rem, 6vw, 5rem);
+  letter-spacing: 0.2em;
+  margin-bottom: 3rem;
+}
+
+.contact-content form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.contact-content input,
+.contact-content textarea {
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid rgba(255,255,255,0.2);
+  color: #fff;
+  padding: 1rem 0;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.3s;
+}
+
+.contact-content input:focus,
+.contact-content textarea:focus {
+  border-bottom-color: #fff;
+}
+
+.contact-content button {
+  background: #fff;
+  color: #000;
+  border: none;
+  padding: 1.2rem;
+  font-family: var(--font-display);
+  letter-spacing: 0.2em;
+  cursor: pointer;
+  margin-top: 1rem;
+  transition: opacity 0.3s;
+}
+
+.contact-content button:hover {
+  opacity: 0.8;
+}
+
+.contact-socials {
+  margin-top: 3rem;
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+}
+
+.contact-socials a {
+  color: rgba(255,255,255,0.5);
+  text-decoration: none;
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  letter-spacing: 0.1em;
+  transition: color 0.3s;
+}
+
+.contact-socials a:hover {
+  color: #fff;
+}
+
+/* Staggered 2x2 Grid Panel */
+.panel--grid-4 {
+  width: 80vw !important;
+  height: 100vh !important;
+  display: flex !important;
+  flex-direction: row !important;
+  gap: 4px;
+  background: #000; /* Black gutters */
+  padding: 0;
+  overflow: hidden;
+}
+
+.grid-column {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  height: 100%;
+}
+
+.col-left { width: 58%; }
+.col-right { width: 42%; }
+
+.item-tl { height: 42%; }
+.item-bl { height: 58%; }
+.item-tr { height: 67%; }
+.item-br { height: 33%; }
+
+.panel--grid-4 .grid-item {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  background: #111; 
+}
+
+.panel--grid-4 img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Grunge accents — rough borders on panels */
+.panel--photo::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border: 2px solid rgba(255,255,255,0.05);
+  box-shadow:
+    inset 0 0 30px rgba(0,0,0,0.4),
+    inset 0 0 80px rgba(0,0,0,0.2);
+  pointer-events: none;
+}

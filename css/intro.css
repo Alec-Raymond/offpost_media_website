@@ -1,0 +1,117 @@
+/* Full-screen black overlay that sits on top of everything */
+#intro-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  pointer-events: none; /* Allow clicks to pass through to Nav */
+}
+
+/* Ensure the elements inside the intro are still visible/managed correctly */
+#intro-overlay > * {
+  pointer-events: none;
+}
+
+/* Flash/Collage images — absolutely positioned */
+#intro-overlay .flash-img {
+  position: absolute;
+  opacity: 0;
+  background: #000; /* Black behind image if it doesn't fill perfectly */
+  border: 4px solid #fff;
+  box-shadow: 0 15px 45px rgba(0,0,0,0.6);
+  transition: opacity 0.4s ease, transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.2);
+}
+
+#intro-overlay .flash-img img {
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+
+/* Halftone dot overlay for photos */
+.halftone-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  opacity: 0.15;
+  background-image: radial-gradient(#ff0000 15%, transparent 16%);
+  background-size: 6px 6px;
+  mix-blend-mode: multiply;
+}
+
+/* Transition: overlay removal (no fade for impact) */
+#intro-overlay.hide-instant {
+  display: none !important;
+}
+
+#intro-logo-container.negative-logo {
+  background: #fff !important;
+  mix-blend-mode: normal;
+}
+
+#intro-logo-container.negative-logo h1, 
+#intro-logo-container.negative-logo p {
+  color: #000 !important;
+  background: transparent !important;
+}
+
+/* Frost edge effect */
+#frost-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 950;
+  opacity: 0;
+  background: 
+    radial-gradient(circle at center, transparent 65%, rgba(255,255,255,0.2) 100%);
+  transition: opacity 3s ease-in-out;
+}
+
+/* The grainy texture layer */
+#frost-overlay::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3%3Cfilter id='noiseFilter'%3%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3%3C/filter%3%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3%3C/svg%3");
+  opacity: 0.3;
+  mix-blend-mode: screen;
+  pointer-events: none;
+  mask-image: radial-gradient(circle at center, transparent 50%, black 100%);
+  -webkit-mask-image: radial-gradient(circle at center, transparent 50%, black 100%);
+}
+
+#frost-overlay.visible {
+  opacity: 1;
+}
+
+#frost-overlay::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3%3Cfilter id='noiseFilter'%3%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3%3C/filter%3%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3%3C/svg%3");
+  opacity: 0.3;
+  mix-blend-mode: overlay;
+}
+
+#intro-overlay {
+  transition: background-color 0.8s ease, opacity 1s ease;
+}
+
+/* Post-video photos that pop up on top */
+.post-video-photo {
+  position: absolute;
+  width: 300px;
+  height: auto;
+  opacity: 0;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+  border: 4px solid #fff;
+  z-index: 1001;
+  pointer-events: none;
+  transition: opacity 1.2s ease, transform 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OFFPOST — Surf Photography</title>
+
+  <!-- Preload critical fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/intro.css">
+  <link rel="stylesheet" href="css/scroll.css">
+  <link rel="stylesheet" href="css/noise.css">
+</head>
+<body>
+  <!-- NOISE OVERLAY — always visible -->
+  <div id="noise-overlay" aria-hidden="true"></div>
+
+  <!-- INTRO OVERLAY -->
+  <div id="intro-overlay">
+    <div class="projector-bar"></div>
+    <div class="panel__overlay" id="intro-logo-container" style="opacity: 0; position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 2000;">
+      <h1 class="brand" style="margin: 0; font-size: 8vw; color: #fff;">OFFPOST</h1>
+      <p class="tagline" id="intro-tagline" style="margin: 0; opacity: 0; transition: opacity 0.8s ease; font-family: var(--font-display); font-size: clamp(1rem, 3vw, 2rem); letter-spacing: 0.5em; text-transform: uppercase; color: rgba(255,255,255,0.5);">MEDIA</p>
+    </div>
+    <div id="impact-flash" style="position: absolute; inset: 0; background: #fff; opacity: 0; z-index: 3000; pointer-events: none;"></div>
+  </div>
+
+  <div id="scroll-tip" style="position: fixed; bottom: 2rem; right: 2rem; z-index: 1001; font-family: 'Roboto', sans-serif; font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(255,255,255,0.4); opacity: 0; transition: opacity 0.3s ease; pointer-events: none;">scroll to explore →</div>
+
+  <!-- NAV -->
+  <nav id="main-nav" style="pointer-events: auto; z-index: 5000;">
+    <a href="index.html" class="nav-brand" style="opacity: 0; transition: opacity 0.5s ease;">OFFPOST</a>
+    <div class="nav-links">
+      <a href="https://www.instagram.com/offpostmedia/" target="_blank">PORTFOLIO</a>
+      <a href="#" id="nav-contact">CONTACT</a>
+    </div>
+  </nav>
+
+  <!-- MAIN HORIZONTAL SCROLL CONTAINER -->
+  <div id="scroll-wrapper">
+    <div id="scroll-track">
+
+      <!-- Section 1: Hero video -->
+      <section class="panel panel--hero">
+        <video id="hero-video" muted playsinline preload="auto">
+          <source src="assets/video/hero-clip.webm" type="video/webm">
+          <source src="assets/video/hero-clip.mp4" type="video/mp4">
+        </video>
+        <div class="panel__overlay" id="hero-logo-overlay">
+          <h1 class="brand" id="hero-brand" style="opacity: 0;">OFFPOST</h1>
+          <p class="tagline" id="hero-tagline" style="opacity: 0; font-family: var(--font-display); font-size: clamp(1rem, 3vw, 2rem); letter-spacing: 0.5em; text-transform: uppercase; color: rgba(255,255,255,0.5);">MEDIA</p>
+        </div>
+      </section>
+
+      <!-- Section 2: Staggered 2x2 Grid -->
+      <section class="panel panel--grid-4">
+        <div class="grid-column col-left">
+          <div class="grid-item item-tl"><img data-src="assets/images/medium/img_6989.jpg" class="grid-lazy" alt="Top Left"></div>
+          <div class="grid-item item-bl"><img data-src="assets/images/medium/img_6969.jpg" class="grid-lazy" alt="Bottom Left"></div>
+        </div>
+        <div class="grid-column col-right">
+          <div class="grid-item item-tr"><img data-src="assets/images/medium/img_6903.jpg" class="grid-lazy" alt="Top Right"></div>
+          <div class="grid-item item-br"><img data-src="assets/images/medium/img_7305.jpg" class="grid-lazy" alt="Bottom Right"></div>
+        </div>
+      </section>
+
+      <!-- Section 3: 1-over-3 Grid -->
+      <section class="panel panel--grid-1-2">
+        <div class="grid-row row-top">
+          <div class="grid-item"><img data-src="assets/images/medium/img_7300.jpg" class="grid-lazy" alt="Top Wide"></div>
+        </div>
+        <div class="grid-row row-bottom">
+          <div class="grid-item"><img data-src="assets/images/medium/img_6806.jpg" class="grid-lazy" alt="Bottom Left"></div>
+          <div class="grid-item"><img data-src="assets/images/medium/img_7302.jpg" class="grid-lazy" alt="Bottom Middle"></div>
+          <div class="grid-item"><img data-src="assets/images/medium/img_6798.jpg" class="grid-lazy" alt="Bottom Right"></div>
+        </div>
+      </section>
+
+      <!-- Section 4: Portrait Photo -->
+      <section class="panel panel--photo panel--portrait">
+        <picture>
+          <img data-src="assets/images/full/img_7296.jpg" alt="Portrait photo">
+        </picture>
+      </section>
+
+      <!-- Section 5: Contact Panel -->
+      <section id="contact-panel" class="panel panel--contact">
+        <div class="contact-content">
+          <img data-src="assets/images/medium/img_6967.jpg" class="grid-lazy contact-image" alt="Contact image" style="width: 100%; height: auto; margin-top: 1.5rem; margin-bottom: 0.5rem; border: 4px solid #fff;">
+          <h2 style="margin-bottom: 0; position: relative; margin-top: 1rem;">CONTACT</h2>
+          <a href="mailto:hello@offpost.media" style="font-size: 1.2rem; color: rgba(255,255,255,0.5); text-decoration: none; font-family: var(--font-display); letter-spacing: 0.1em; display: block; margin-bottom: 2rem; text-transform: uppercase;">hello@offpost.media</a>
+          <form action="https://formspree.io/f/YOUR_ID" method="POST">
+            <input type="text" name="name" placeholder="NAME" required style="font-family: var(--font-display); letter-spacing: 0.1em;">
+            <input type="email" name="email" placeholder="EMAIL" required style="font-family: var(--font-display); letter-spacing: 0.1em;">
+            <textarea name="message" placeholder="MESSAGE" rows="5" required style="font-family: var(--font-display); letter-spacing: 0.1em;"></textarea>
+            <button type="submit">SEND IT</button>
+          </form>
+        </div>
+      </section>
+
+    </div>
+  </div>
+
+  <script type="module" src="js/intro.js"></script>
+  <script type="module" src="js/scroll_physics.js"></script>
+</body>
+</html>
