@@ -33,10 +33,10 @@ class IntroSequence {
     this.audio = new ProjectorAudio('assets/audio/projector.mp3');
     this.isStarted = false;
     this.photosShown = false;
-    this.isSkipped = false;
   }
 
   async init() {
+    // Listen for skip event from scroll_physics
     window.addEventListener('skip-intro', () => this.skipIntro());
 
     const safety = setTimeout(() => this.startSequence(), 3000);
@@ -51,14 +51,14 @@ class IntroSequence {
   }
 
   startSequence() {
-    if (this.isStarted || this.isSkipped) return;
+    if (this.isStarted) return;
     this.isStarted = true;
 
     this.audio.init();
     this.runCollageSequence();
 
-    setTimeout(() => { if(!this.isSkipped) this.surgeUp(); }, INTRO_DURATION - 800);
-    setTimeout(() => { if(!this.isSkipped) this.slamDown(); }, INTRO_DURATION);
+    setTimeout(() => this.surgeUp(), INTRO_DURATION - 800);
+    setTimeout(() => this.slamDown(), INTRO_DURATION);
   }
 
   skipIntro() {
@@ -72,7 +72,7 @@ class IntroSequence {
       this.video.style.opacity = '0';
     }
     
-    // Show Main Branding (Stay Visible)
+    // Show Main Branding
     if (this.heroBrand) this.heroBrand.style.opacity = '1';
     if (this.heroTagline) this.heroTagline.style.opacity = '1'; 
     if (this.heroLogo) this.heroLogo.style.opacity = '1';
@@ -97,7 +97,7 @@ class IntroSequence {
     frost.id = 'frost-overlay';
     this.overlay.appendChild(frost);
     
-    setTimeout(() => { if(!this.isSkipped && frost.parentNode) frost.classList.add('visible'); }, 100);
+    setTimeout(() => { if(frost.parentNode) frost.classList.add('visible'); }, 100);
     
     sequence.forEach((s, i) => {
       setTimeout(() => {
@@ -134,21 +134,18 @@ class IntroSequence {
   }
 
   surgeUp() {
-    if (this.isSkipped) return;
     this.logoContainer.style.opacity = 0;
     this.logoContainer.style.transform = 'translateY(-10px) scale(1.02)';
     this.logoContainer.style.transition = 'transform 0.8s cubic-bezier(0.22, 1, 0.36, 1)';
 
-    setTimeout(() => { if(!this.isSkipped) this.logoContainer.style.opacity = '1'; }, 50);
-    setTimeout(() => { if(!this.isSkipped) this.logoContainer.style.opacity = '0'; }, 550);
+    setTimeout(() => { this.logoContainer.style.opacity = '1'; }, 50);
+    setTimeout(() => { this.logoContainer.style.opacity = '0'; }, 550);
     setTimeout(() => { 
-      if(!this.isSkipped) {
-        this.logoContainer.style.transition = 'none'; 
-        this.logoContainer.classList.add('negative-logo');
-        this.logoContainer.style.opacity = '1'; 
-      }
+      this.logoContainer.style.transition = 'none'; 
+      this.logoContainer.classList.add('negative-logo');
+      this.logoContainer.style.opacity = '1'; 
     }, 750);
-    setTimeout(() => { if(!this.isSkipped) this.logoContainer.style.opacity = '0'; }, 800);
+    setTimeout(() => { this.logoContainer.style.opacity = '0'; }, 800);
     
     const collage = this.overlay.querySelectorAll('.flash-img');
     collage.forEach(el => {
@@ -159,7 +156,6 @@ class IntroSequence {
   }
 
   slamDown() {
-    if (this.isSkipped) return;
     if (this.video) {
       this.flash.classList.add('flash-active');
       this.video.play().catch(() => {
@@ -171,7 +167,6 @@ class IntroSequence {
       const frost = document.getElementById('frost-overlay');
       if (frost) frost.remove();
       
-      // Ensure Hero Logo is PERMANENTLY visible
       if (this.heroBrand) this.heroBrand.style.opacity = '1';
       if (this.heroTagline) this.heroTagline.style.opacity = '1';
       if (this.heroLogo) {
@@ -196,15 +191,12 @@ class IntroSequence {
       });
 
       this.video.addEventListener('ended', () => {
-        if (this.isSkipped) return;
         this.video.pause();
         this.video.style.opacity = '0';
         
-        // DO NOT HIDE LOGO. STAY 1.
         if (this.heroBrand) this.heroBrand.style.opacity = '1';
         if (this.heroTagline) this.heroTagline.style.opacity = '1';
         
-        // Simply start photo sequence
         setTimeout(() => this.showPostVideoPhotos(), 500);
       }, { once: true });
     } else {
@@ -254,6 +246,17 @@ class IntroSequence {
         }, instant ? 0 : 100);
 
         if (i === 2) this._enableScroll();
+
+        // Fade out "MEDIA" tagline after last photo
+        if (i === POST_VIDEO_PHOTOS.length - 1) {
+          setTimeout(() => {
+            const taglines = document.querySelectorAll('.tagline');
+            taglines.forEach(t => {
+              t.style.transition = 'opacity 1.5s ease';
+              t.style.opacity = '0';
+            });
+          }, instant ? 0 : 1500);
+        }
       };
 
       if (instant) show();
