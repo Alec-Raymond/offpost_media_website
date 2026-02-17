@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portfolio — Outpost Media</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/portfolio.css">
+  <link rel="stylesheet" href="css/noise.css">
+</head>
+<body class="portfolio-page">
+  <div id="noise-overlay" aria-hidden="true"></div>
+
+  <header class="portfolio-header">
+    <a href="index.html" class="back-link">← OUTPOST MEDIA</a>
+    <nav>
+      <a href="#contact">CONTACT</a>
+    </nav>
+  </header>
+
+  <!-- Grid is populated by JS from portfolio-config.json -->
+  <main id="portfolio-grid"></main>
+
+  <!-- Lightbox for full-res viewing -->
+  <div id="lightbox" class="lightbox" hidden>
+    <button class="lightbox__close">&times;</button>
+    <img class="lightbox__img" src="" alt="">
+  </div>
+
+  <div id="contact" class="contact-modal">
+    <a href="#" class="contact-modal__close" aria-label="Close contact">&times;</a>
+    <h2>CONTACT</h2>
+    <form action="https://formspree.io/f/YOUR_ID" method="POST">
+      <input type="text" name="name" placeholder="Name" required>
+      <input type="email" name="email" placeholder="Email" required>
+      <textarea name="message" placeholder="Message" rows="5" required></textarea>
+      <button type="submit">SEND</button>
+    </form>
+    <div class="contact-socials">
+      <a href="#">Instagram</a>
+      <a href="#">Email</a>
+    </div>
+  </div>
+
+  <script type="module" src="js/portfolio.js"></script>
+</body>
+</html>

@@ -15,6 +15,7 @@ class HorizontalScroll {
 
     // Touch state
     this.touchLastX = 0;
+    this.touchLastY = 0;
 
     this.loader = new MediaLoader();
     this._animate = this._animate.bind(this);
@@ -62,12 +63,15 @@ class HorizontalScroll {
   }
 
   startScrollHintTimer() {
-    setTimeout(() => {
-      const scrollTip = document.getElementById('scroll-tip');
-      if (scrollTip && this.current < 50 && scrollTip.style.display !== 'none') {
-        scrollTip.style.opacity = '1';
-      }
-    }, 10000);
+    // Listen for the specific moment the tagline finishes fading
+    window.addEventListener('tagline-faded', () => {
+      setTimeout(() => {
+        const scrollTip = document.getElementById('scroll-tip');
+        if (scrollTip && this.current < 50 && scrollTip.style.display !== 'none') {
+          scrollTip.style.opacity = '1';
+        }
+      }, 2000);
+    }, { once: true });
   }
 
   bindContactLink() {
@@ -102,11 +106,15 @@ class HorizontalScroll {
   bindEvents() {
     window.addEventListener('resize', () => {
       this.isMobile = window.innerWidth < 768;
-      if (this.isMobile) this.track.style.transform = 'none';
+      
+      // Clamp current positions to the new maximum scroll limit
+      const maxScroll = this._getMaxScroll();
+      this.target = Math.min(this.target, maxScroll);
+      this.current = Math.min(this.current, maxScroll);
     });
 
     window.addEventListener('wheel', (e) => {
-      if (!this.isEnabled || this.isMobile) return;
+      if (!this.isEnabled) return;
       e.preventDefault();
       this.target += e.deltaY * 1.2;
       this.target = Math.max(0, Math.min(this.target, this._getMaxScroll()));
@@ -116,20 +124,35 @@ class HorizontalScroll {
     window.addEventListener('touchstart', (e) => {
       if (!this.isEnabled) return;
       this.touchLastX = e.touches[0].clientX;
-    }, { passive: true });
+      this.touchLastY = e.touches[0].clientY;
+    }, { passive: false });
 
     window.addEventListener('touchmove', (e) => {
       if (!this.isEnabled) return;
+      
       const touchX = e.touches[0].clientX;
-      const delta = this.touchLastX - touchX;
-      this.target += delta * 1.2;
+      const touchY = e.touches[0].clientY;
+      
+      const deltaX = this.touchLastX - touchX;
+      const deltaY = this.touchLastY - touchY;
+      
+      // Use both X and Y movement for horizontal scroll on mobile
+      // This makes the swipe feel more natural regardless of exact angle
+      const delta = Math.abs(deltaX) > Math.abs(deltaY) ? deltaX : deltaY;
+      
+      this.target += delta * 1.5;
       this.target = Math.max(0, Math.min(this.target, this._getMaxScroll()));
+      
       this.touchLastX = touchX;
-    }, { passive: true });
+      this.touchLastY = touchY;
+
+      // Prevent default vertical scroll behavior
+      if (e.cancelable) e.preventDefault();
+    }, { passive: false });
 
     // Keyboard navigation
     window.addEventListener('keydown', (e) => {
-      if (!this.isEnabled || this.isMobile) return;
+      if (!this.isEnabled) return;
       if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
         e.preventDefault();
         this.target += 200;
@@ -148,7 +171,7 @@ class HorizontalScroll {
   }
 
   _animate() {
-    if (!this.isMobile && this.isEnabled) {
+    if (this.isEnabled) {
       if (Math.abs(this.target - this.current) < 0.5) {
         this.current = this.target;
       } else {

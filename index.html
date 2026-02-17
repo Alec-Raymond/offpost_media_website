@@ -22,14 +22,14 @@
   <!-- INTRO OVERLAY -->
   <div id="intro-overlay">
     <div class="projector-bar"></div>
-    <div class="panel__overlay" id="intro-logo-container" style="opacity: 0; position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 2000;">
-      <h1 class="brand" style="margin: 0; font-size: 8vw; color: #fff;">OFFPOST</h1>
-      <p class="tagline" id="intro-tagline" style="margin: 0; opacity: 0; transition: opacity 0.8s ease; font-family: var(--font-display); font-size: clamp(1rem, 3vw, 2rem); letter-spacing: 0.5em; text-transform: uppercase; color: rgba(255,255,255,0.5);">MEDIA</p>
+    <div class="panel__overlay center-scale" id="intro-logo-container" style="opacity: 0; position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 5000;">
+      <h1 class="brand" style="color: #fff;">OFFPOST</h1>
+      <p class="tagline" id="intro-tagline" style="opacity: 0; transition: opacity 0.8s ease; color: rgba(255,255,255,0.5);">MEDIA</p>
     </div>
     <div id="impact-flash" style="position: absolute; inset: 0; background: #fff; opacity: 0; z-index: 3000; pointer-events: none;"></div>
   </div>
 
-  <div id="scroll-tip" style="position: fixed; bottom: 2rem; right: 2rem; z-index: 1001; font-family: 'Roboto', sans-serif; font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(255,255,255,0.4); opacity: 0; transition: opacity 0.3s ease; pointer-events: none;">scroll to explore →</div>
+  <div id="scroll-tip" style="position: fixed; bottom: 2rem; right: 2rem; z-index: 1001; font-family: 'Roboto', sans-serif; font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(255,255,255,0.4); opacity: 0; transition: opacity 0.3s ease; pointer-events: none;">scroll →</div>
 
   <!-- NAV -->
   <nav id="main-nav" style="pointer-events: auto; z-index: 5000;">
@@ -46,14 +46,18 @@
 
       <!-- Section 1: Hero video -->
       <section class="panel panel--hero">
-        <video id="hero-video" muted playsinline preload="auto">
-          <source src="assets/video/hero-clip.webm" type="video/webm">
-          <source src="assets/video/hero-clip.mp4" type="video/mp4">
-        </video>
-        <div class="panel__overlay" id="hero-logo-overlay">
-          <h1 class="brand" id="hero-brand" style="opacity: 0;">OFFPOST</h1>
-          <p class="tagline" id="hero-tagline" style="opacity: 0; font-family: var(--font-display); font-size: clamp(1rem, 3vw, 2rem); letter-spacing: 0.5em; text-transform: uppercase; color: rgba(255,255,255,0.5);">MEDIA</p>
+        <div class="hero-video-wrapper">
+          <video id="hero-video" muted playsinline preload="auto">
+            <source src="assets/video/hero-clip.webm" type="video/webm">
+            <source src="assets/video/hero-clip.mp4" type="video/mp4">
+          </video>
+          <div class="panel__overlay center-scale" id="hero-logo-overlay">
+            <h1 class="brand" id="hero-brand">OFFPOST</h1>
+            <p class="tagline" id="hero-tagline" style="color: rgba(255,255,255,0.5);">MEDIA</p>
+          </div>
         </div>
+        <!-- This now sits directly on top of the video area -->
+        <div id="hero-collage-area" class="hero-collage-wrapper"></div>
       </section>
 
       <!-- Section 2: Staggered 2x2 Grid -->
@@ -90,7 +94,7 @@
       <!-- Section 5: Contact Panel -->
       <section id="contact-panel" class="panel panel--contact">
         <div class="contact-content">
-          <img data-src="assets/images/medium/img_6967.jpg" class="grid-lazy contact-image" alt="Contact image" style="width: 100%; height: auto; margin-top: 1.5rem; margin-bottom: 0.5rem; border: 4px solid #fff;">
+          <img src="assets/images/medium/img_6967.jpg" class="contact-image" alt="Contact image" style="width: 100%; height: auto; margin-top: 1.5rem; margin-bottom: 0.5rem; border: 4px solid #fff;">
           <h2 style="margin-bottom: 0; position: relative; margin-top: 1rem;">CONTACT</h2>
           <a href="mailto:hello@offpost.media" style="font-size: 1.2rem; color: rgba(255,255,255,0.5); text-decoration: none; font-family: var(--font-display); letter-spacing: 0.1em; display: block; margin-bottom: 2rem; text-transform: uppercase;">hello@offpost.media</a>
           <form action="https://formspree.io/f/YOUR_ID" method="POST">

@@ -8,7 +8,8 @@
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  pointer-events: none; /* Allow clicks to pass through to Nav */
+  pointer-events: none;
+  transition: background-color 0.8s ease, opacity 1s ease;
 }
 
 /* Ensure the elements inside the intro are still visible/managed correctly */
