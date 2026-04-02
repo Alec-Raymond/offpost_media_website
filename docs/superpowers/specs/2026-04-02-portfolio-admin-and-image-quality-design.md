@@ -6,12 +6,16 @@ Two independent workstreams:
 1. **Portfolio admin system** — server-backed album management with auth, upload, ordering, and a redesigned portfolio/viewer experience
 2. **Image quality & loading fixes** — upgrade main page (`index.html`) images to use `<picture>` with avif/webp/jpg and responsive `srcset`, fix lazy loading to eliminate pop-in
 
+## Core Principle
+
+**Image quality is the top priority.** This is a photography website — every image should be presented at the highest quality the viewer's device and connection can handle. When there is a trade-off between file size and visual fidelity, favor quality. Use the best available format (AVIF > WebP > JPG), serve the highest resolution the screen can display, and only downsize for genuinely constrained scenarios (small mobile screens, slow connections). Compression artifacts, soft images, or visible quality loss are unacceptable.
+
 ## Constraints
 
 - No changes to existing layout values on `index.html`
 - No video changes — hero clip stays as-is
 - No automatic image processing on upload — user pre-processes images into the expected directory structure before uploading
-- Site must work well on mobile and low-data connections
+- Site must work well on mobile and low-data connections (but quality is still prioritized — serve the highest quality the device can handle)
 
 ---
 
