@@ -53,6 +53,8 @@ Single `server.js` using Express:
 - `title` max 30 characters
 - `id` must be URL-safe: lowercase alphanumeric and hyphens only. Used as both the album identifier and the subdirectory name under `assets/portfolio/`.
 
+**First launch:** If `albums.json` does not exist when the server starts, it creates an empty file: `{"albums": []}`. The portfolio page renders an empty grid with a "No albums yet" message. The admin dashboard works normally — the user can immediately upload.
+
 **Migration from `portfolio-config.json`:** The existing `portfolio-config.json` and `portfolio.js` (client-side grid builder) are retired. Existing portfolio images in `assets/images/` remain untouched but are no longer referenced by the portfolio page. Albums are created fresh through the admin UI. The old files can be removed once the new system is live.
 
 ### Upload Directory Structure
@@ -61,10 +63,12 @@ Albums are stored separately from the main page images:
 
 ```
 assets/portfolio/<album-id>/
-  thumbs/    # Small placeholders (~200px wide)
-  medium/    # Display size (~800px wide)
-  full/      # Full resolution for viewer
+  thumbs/    # Small placeholders, exactly 200px wide
+  medium/    # Display size, exactly 800px wide
+  full/      # Full resolution for viewer (expected ~2400px wide, but actual width varies)
 ```
+
+**Important:** The `w` descriptors in `srcset` must match the actual pixel width of each file. `thumbs/` = `200w`, `medium/` = `800w`, `full/` = actual pixel width (use the real value, e.g., `2400w` if the image is 2400px wide).
 
 Each size directory contains the same filenames in all supported formats:
 ```
@@ -82,6 +86,14 @@ assets/portfolio/hawaii-2024/
 
 **Upload flow:** The user selects multiple image files via the admin UI file input. The server expects pre-processed files following the naming convention: `<size>-<filename>` (e.g., `thumbs-img_6638.jpg`, `medium-img_6638.avif`, `full-img_6638.jpg`). The server parses the prefix, creates the directory structure, and sorts the base filenames alphanumerically to build the `photos` array.
 
+**Complete example for one photo** (3 sizes x 3 formats = 9 files per photo):
+```
+thumbs-img_6638.jpg    thumbs-img_6638.webp    thumbs-img_6638.avif
+medium-img_6638.jpg    medium-img_6638.webp    medium-img_6638.avif
+full-img_6638.jpg      full-img_6638.webp      full-img_6638.avif
+```
+An album of 10 photos = 90 files uploaded at once.
+
 **Upload limits:** 20MB per file. Total upload capped at 500MB per request (a large album with all sizes/formats).
 
 ### API Routes
@@ -95,7 +107,7 @@ assets/portfolio/hawaii-2024/
 | `/admin/albums/upload` | POST | Yes | Receives pre-processed photos, creates album entry |
 | `/admin/albums/reorder` | POST | Yes | Swaps album order. Payload: `{ "albumId": "hawaii-2024", "direction": "up" }`. Swaps `order` with the adjacent album in that direction. |
 | `/admin/albums/:id/update` | POST | Yes | Updates title/showTitle |
-| `/admin/albums/:id` | DELETE | Yes | Removes album entry from albums.json and deletes `assets/portfolio/<id>/` directory |
+| `/admin/albums/:id` | DELETE | Yes | Removes album entry from albums.json and deletes `assets/portfolio/<id>/` directory. If the directory doesn't exist or deletion partially fails, the JSON entry is still removed and a warning is logged. |
 | `/portfolio` | GET | No | Serves portfolio page (album grid) |
 | `/album/:id` | GET | No | Serves album viewer page |
 
@@ -106,7 +118,7 @@ assets/portfolio/hawaii-2024/
 - **Sessions:** Server-side sessions with `SESSION_SECRET` from `.env`. Cookies are `httpOnly`, `sameSite: strict`. The `secure` flag is set only when `NODE_ENV=production`. 2-hour expiry.
 - **Rate limiting:** 5 login attempts per minute on `POST /admin/login`
 - **Upload validation:** Accept only image file types (jpg, png, webp, avif) by checking MIME type. 20MB per file, 500MB per request.
-- **`.env` in `.gitignore`** — secrets never committed
+- **`.env` in `.gitignore`** — add `.env` to `.gitignore` as an implementation step (not currently present)
 
 **`.env.example`** provided in the repo:
 ```
@@ -137,9 +149,10 @@ Server-rendered HTML pages using **EJS templates**, styled to match the site (Os
 **Album grid (`/portfolio`):**
 - 2-wide grid of album covers
 - Last album is 1-wide (full grid width) if odd count
-- Each cover: `photos[0]` of the album, using `<picture>` with avif/webp/jpg from `medium/`, `object-fit: cover`, fixed 3:2 aspect ratio
+- Each cover: `photos[0]` of the album, using `<picture>` with avif/webp/jpg. The `<img>` `src` loads `thumbs/` as a low-res placeholder; `srcset` provides `medium/` (800w) and `full/` (2400w) for resolution switching. `object-fit: cover`, fixed 3:2 aspect ratio.
 - If `showTitle` is true: title overlaid bottom-left, Oswald font, white text, subtle text shadow
 - Clicking a cover navigates to `/album/:id`
+- `alt` text for covers: use album title if `showTitle` is true, otherwise use `"Album: <album-id>"` as a basic accessible label
 - Server-rendered with EJS from `albums.json`
 
 **Album viewer (`/album/:id`):**
@@ -150,6 +163,7 @@ Server-rendered HTML pages using **EJS templates**, styled to match the site (Os
 - White 4px border on the photo (matching existing site style)
 - `3rem` padding between white border and screen edges on all sides
 - White left/right arrow buttons on each side, vertically centered, Oswald font
+- `alt` text for viewer photos: `"Photo <n> of <total>"` (e.g., "Photo 3 of 12")
 - Keyboard support: left/right arrow keys
 - First photo: no left arrow. Last photo: no right arrow.
 - Close/back button (top-right "X") to return to `/portfolio`
@@ -193,8 +207,8 @@ These fixed `rem` values match the actual CSS widths. The browser compares them 
 
 ### Post-Video Collage Photos (intro.js)
 
-- `preloadCritical()` currently takes URL strings and fetches them directly. To support format selection: detect best supported format at init time using a small canvas test (attempt to export a 1x1 canvas as `image/avif`, then `image/webp` — if `toDataURL` returns a valid data URL, the format is supported). Store the result on the `MediaLoader` instance.
-- `preloadCritical()` then maps each base URL to the best format variant before fetching.
+- `preloadCritical()` currently takes URL strings and fetches them directly. To support format selection: detect best supported format at init time using the data URI probe technique — attempt to decode a tiny 1x1 AVIF data URI via `new Image()`, check `onload`/`onerror`. If AVIF is supported, use it; otherwise probe WebP the same way; fall back to JPG. This is more reliable than `canvas.toDataURL()` which tests *encode* support (most browsers can decode AVIF but cannot encode it to canvas). Store the detected best format on the `MediaLoader` instance.
+- `preloadCritical()` then maps each base URL to the best format variant before fetching (e.g., `.jpg` -> `.avif` if AVIF is supported).
 - When `intro.js` creates photo elements dynamically, it uses `<picture>` with avif/webp/jpg `<source>` elements, using blob URLs from the cache where available.
 
 ### Portrait Section
