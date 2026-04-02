@@ -14,7 +14,7 @@ Two independent workstreams:
 
 - No changes to existing layout values on `index.html`
 - No video changes — hero clip stays as-is
-- No automatic image processing on upload — user pre-processes images into the expected directory structure before uploading
+- Server auto-processes uploaded images into all sizes and formats using `sharp`
 - Site must work well on mobile and low-data connections (but quality is still prioritized — serve the highest quality the device can handle)
 
 ---
@@ -29,7 +29,7 @@ Single `server.js` using Express:
 - Single process, no external services
 - Production mode determined by `NODE_ENV=production` environment variable
 
-**Dependencies:** `express`, `multer` (file uploads), `bcrypt` (passcode hashing), `express-session` (session management), `express-rate-limit` (brute force protection), `ejs` (templating)
+**Dependencies:** `express`, `multer` (file uploads), `bcrypt` (passcode hashing), `express-session` (session management), `express-rate-limit` (brute force protection), `ejs` (templating), `sharp` (image processing — resize and convert to jpg/webp/avif)
 
 **Session store:** Uses the default `MemoryStore`. Acceptable for this use case — single admin user, low traffic. Sessions are lost on server restart (admin re-enters passcode). Not suitable if the server scales to multiple processes.
 
@@ -72,8 +72,6 @@ assets/portfolio/<album-id>/
   full/      # Full resolution for viewer (expected ~2400px wide, but actual width varies)
 ```
 
-**Important:** The `w` descriptors in `srcset` must match the actual pixel width of each file. `thumbs/` = `200w`, `medium/` = `800w`, `full/` = actual pixel width (use the real value, e.g., `2400w` if the image is 2400px wide).
-
 Each size directory contains the same filenames in all supported formats:
 ```
 assets/portfolio/hawaii-2024/
@@ -88,17 +86,16 @@ assets/portfolio/hawaii-2024/
   full/img_6638.avif
 ```
 
-**Upload flow:** The user selects multiple image files via the admin UI file input. The server expects pre-processed files following the naming convention: `<size>-<filename>` (e.g., `thumbs-img_6638.jpg`, `medium-img_6638.avif`, `full-img_6638.jpg`). The server parses the prefix, creates the directory structure, and sorts the base filenames alphanumerically to build the `photos` array.
+**Upload flow:** The user selects original photo files (any common format — jpg, png, tiff, etc.) via the admin UI file input. The server uses `sharp` to auto-generate all sizes and formats:
+- `full/` — resized to 2400px wide (or original width if smaller), saved as jpg (quality 90), webp (quality 85), avif (quality 80)
+- `medium/` — resized to 1200px wide, same three formats
+- `thumbs/` — resized to 200px wide, same three formats
+- Original aspect ratio is always preserved
+- Filenames are normalized to lowercase alphanumeric with the original extension replaced
 
-**Complete example for one photo** (3 sizes x 3 formats = 9 files per photo):
-```
-thumbs-img_6638.jpg    thumbs-img_6638.webp    thumbs-img_6638.avif
-medium-img_6638.jpg    medium-img_6638.webp    medium-img_6638.avif
-full-img_6638.jpg      full-img_6638.webp      full-img_6638.avif
-```
-An album of 10 photos = 90 files uploaded at once.
+The `photos` array in `albums.json` stores base filenames (e.g., `img_6638`) sorted alphanumerically. The `w` descriptors in `srcset` use fixed values: `200w` for thumbs, `1200w` for medium, `2400w` for full.
 
-**Upload limits:** 20MB per file. Total upload capped at 500MB per request (a large album with all sizes/formats).
+**Upload limits:** 30MB per file (raw originals can be large). Total upload capped at 500MB per request.
 
 ### API Routes
 
@@ -108,7 +105,7 @@ An album of 10 photos = 90 files uploaded at once.
 | `/admin/login` | POST | No | Validates passcode, sets session |
 | `/admin/dashboard` | GET | Yes | Serves admin dashboard |
 | `/admin/albums` | GET | Yes | Returns albums.json data |
-| `/admin/albums/upload` | POST | Yes | Receives pre-processed photos, creates album entry |
+| `/admin/albums/upload` | POST | Yes | Receives original photos, auto-processes into sizes/formats, creates album entry |
 | `/admin/albums/reorder` | POST | Yes | Swaps album order. Payload: `{ "albumId": "hawaii-2024", "direction": "up" }`. Swaps `order` with the adjacent album in that direction. |
 | `/admin/albums/:id/update` | POST | Yes | Updates title/showTitle |
 | `/admin/albums/:id` | DELETE | Yes | Removes album entry from albums.json and deletes `assets/portfolio/<id>/` directory. If the directory doesn't exist or deletion partially fails, the JSON entry is still removed and a warning is logged. |
@@ -121,7 +118,7 @@ An album of 10 photos = 90 files uploaded at once.
 - **Initial setup:** A setup script (`scripts/hash-passcode.js`) takes a plaintext passcode as an argument and outputs the bcrypt hash to paste into `.env`. Example: `node scripts/hash-passcode.js "my-secure-passcode"`.
 - **Sessions:** Server-side sessions with `SESSION_SECRET` from `.env`. Cookies are `httpOnly`, `sameSite: strict`. The `secure` flag is set only when `NODE_ENV=production`. 2-hour expiry.
 - **Rate limiting:** 5 login attempts per minute on `POST /admin/login`
-- **Upload validation:** Accept only image file types (jpg, png, webp, avif) by checking MIME type. 20MB per file, 500MB per request.
+- **Upload validation:** Accept only image file types (jpg, png, webp, avif, tiff) by checking MIME type. 30MB per file, 500MB per request.
 - **`.env` in `.gitignore`** — add `.env` to `.gitignore` as an implementation step (not currently present)
 
 **`.env.example`** provided in the repo:
@@ -144,7 +141,7 @@ Server-rendered HTML pages using **EJS templates**, styled to match the site (Os
 - Each album row: up/down arrow buttons, album title (editable text field, 30 char max), showTitle checkbox, delete button with confirmation prompt
 - Title field and checkbox are always visible and inline — no separate edit mode
 - "Upload New Album" button at the bottom
-- Upload flow: file input accepting multiple files, text field for album ID (validated: lowercase alphanumeric and hyphens only, must be unique), submit
+- Upload flow: file input accepting multiple original photos, text field for album ID (validated: lowercase alphanumeric and hyphens only, must be unique), submit. Shows a progress indicator while server processes images.
 
 **Session:** Expires after 2 hours, redirects to login.
 
@@ -250,7 +247,6 @@ The `thumbs/` directory under `assets/images/` is not used on `index.html` (the 
 ## Out of Scope
 
 - Video quality changes
-- Automatic image processing/resizing on upload
 - Multi-user accounts
 - HTTPS setup (handled at hosting level)
 - Layout value changes on index.html
