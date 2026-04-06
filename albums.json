@@ -1,3 +1,17 @@
 {
-  "albums": []
+  "albums": [
+    {
+      "showTitle": true,
+      "id": "strt",
+      "title": "ars",
+      "photos": [
+        {
+          "photo": "assets/portfolio/raw/alec-headshots-edited-3.jpg"
+        },
+        {
+          "photo": "assets/portfolio/raw/alec-headshots-edited-6.jpg"
+        }
+      ]
+    }
+  ]
 }
