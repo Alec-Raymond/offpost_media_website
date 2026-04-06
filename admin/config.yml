@@ -1,10 +1,6 @@
 backend:
-  name: github
-  repo: Alec-Raymond/offpost_media_website
+  name: git-gateway
   branch: main
-  base_url: https://api.github.com
-  # Use Netlify Identity for easy login (can also use GitHub OAuth)
-  auth_type: implicit
 
 media_folder: "assets/portfolio/raw"
 public_folder: "/assets/portfolio/raw"
