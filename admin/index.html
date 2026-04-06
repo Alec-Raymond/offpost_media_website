@@ -7,6 +7,14 @@
   <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 </head>
 <body>
+  <!-- Initialize Netlify Identity with your actual Netlify site -->
+  <script>
+    if (window.netlifyIdentity) {
+      window.netlifyIdentity.init({
+        APIUrl: 'https://gorgeous-horse-9e9d91.netlify.app/.netlify/identity'
+      });
+    }
+  </script>
   <!-- Decap CMS script -->
   <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
 </body>

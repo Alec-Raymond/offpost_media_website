@@ -1,6 +1,7 @@
 backend:
   name: git-gateway
   branch: main
+  site_domain: gorgeous-horse-9e9d91.netlify.app
 
 # These are the default fallback folders
 media_folder: "assets/portfolio"
