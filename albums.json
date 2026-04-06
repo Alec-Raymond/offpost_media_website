@@ -1,6 +1,8 @@
 {
   "albums": [
     {
+      "id": "trsat",
+      "title": "st",
       "showTitle": true,
       "photos": [
         {
@@ -9,14 +11,12 @@
         {
           "photo": "assets/portfolio/raw/alec-headshots-edited-6.jpg"
         }
-      ],
-      "id": "trsat",
-      "title": "st"
+      ]
     },
     {
-      "showTitle": true,
       "id": "fpw",
       "title": "qq",
+      "showTitle": true,
       "photos": [
         {
           "photo": "assets/portfolio/raw/ma-77409-1-.webp"
@@ -30,12 +30,22 @@
       ]
     },
     {
-      "showTitle": true,
-      "title": "stra",
       "id": "arst",
+      "title": "stra",
+      "showTitle": true,
       "photos": [
         {
           "photo": "assets/portfolio/raw/dsc07298.jpg"
+        }
+      ]
+    },
+    {
+      "id": "aasta",
+      "title": "strast",
+      "showTitle": true,
+      "photos": [
+        {
+          "photo": "assets/portfolio/raw/DSC07922.jpg"
         }
       ]
     }
