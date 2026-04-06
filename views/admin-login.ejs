@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OFFPOST Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #0a0a0a;
+      color: #f0ece4;
+      font-family: 'Roboto', sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+    .login-container {
+      text-align: center;
+      width: 100%;
+      max-width: 320px;
+      padding: 2rem;
+    }
+    h1 {
+      font-family: 'Oswald', sans-serif;
+      font-size: 2.5rem;
+      letter-spacing: 0.15em;
+      margin-bottom: 3rem;
+    }
+    input[type="password"] {
+      width: 100%;
+      background: transparent;
+      border: none;
+      border-bottom: 1px solid rgba(255,255,255,0.2);
+      color: #f0ece4;
+      font-family: 'Oswald', sans-serif;
+      font-size: 1rem;
+      letter-spacing: 0.1em;
+      padding: 0.8rem 0;
+      outline: none;
+      text-align: center;
+      transition: border-color 0.3s;
+    }
+    input[type="password"]:focus {
+      border-bottom-color: #fff;
+    }
+    button {
+      margin-top: 2rem;
+      background: #fff;
+      color: #000;
+      border: none;
+      padding: 1rem 3rem;
+      font-family: 'Oswald', sans-serif;
+      font-size: 0.9rem;
+      letter-spacing: 0.2em;
+      cursor: pointer;
+      transition: opacity 0.3s;
+    }
+    button:hover { opacity: 0.8; }
+    .error {
+      color: #c44;
+      font-size: 0.85rem;
+      margin-top: 1.5rem;
+      letter-spacing: 0.05em;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <h1>OFFPOST</h1>
+    <form method="POST" action="/admin/login">
+      <input type="password" name="passcode" placeholder="PASSCODE" required autofocus>
+      <button type="submit">ENTER</button>
+    </form>
+    <% if (error) { %>
+      <p class="error"><%= error %></p>
+    <% } %>
+  </div>
+</body>
+</html>

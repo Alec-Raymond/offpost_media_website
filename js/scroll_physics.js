@@ -12,6 +12,7 @@ class HorizontalScroll {
     this.ease = 0.05;
     this.isEnabled = false;
     this.isMobile = window.innerWidth < 768;
+    this.hintShown = false;
 
     // Touch state
     this.touchLastX = 0;
@@ -22,6 +23,32 @@ class HorizontalScroll {
     
     // BIND CONTACT LINK IMMEDIATELY
     this.bindContactLink();
+
+    // Setup hint listener immediately
+    this.setupHintListener();
+
+    // Check for ?contact=true param (from portfolio page contact link)
+    if (new URLSearchParams(window.location.search).get('contact') === 'true') {
+      this._scrollToContact();
+    }
+  }
+
+  setupHintListener() {
+    const showHint = () => {
+      if (this.hintShown) return;
+      this.hintShown = true;
+      setTimeout(() => {
+        const scrollTip = document.getElementById('scroll-tip');
+        if (scrollTip && this.target < 50) {
+          scrollTip.classList.add('scroll-tip--visible');
+        }
+      }, 4000);
+    };
+
+    window.addEventListener('tagline-faded', showHint, { once: true });
+
+    // ABSOLUTE FALLBACK: If nothing happens in 10s, show it anyway
+    setTimeout(showHint, 10000);
   }
 
   _getMaxScroll() {
@@ -30,6 +57,14 @@ class HorizontalScroll {
 
   init() {
     if (!this.track) return;
+
+    // Fix mobile viewport height issues
+    const setRealVh = () => {
+      let vh = window.innerHeight * 0.01;
+      document.documentElement.style.setProperty('--vh', `${vh}px`);
+    };
+    window.addEventListener('resize', setRealVh);
+    setRealVh();
 
     if (document.body.classList.contains('scroll-enabled')) {
       this._start();
@@ -50,7 +85,6 @@ class HorizontalScroll {
     this.isEnabled = true;
     this.bindEvents();
     this.initLazyImages();
-    this.startScrollHintTimer();
     
     setTimeout(() => {
       if (this.target === 0) {
@@ -62,16 +96,17 @@ class HorizontalScroll {
     requestAnimationFrame(this._animate);
   }
 
-  startScrollHintTimer() {
-    // Listen for the specific moment the tagline finishes fading
-    window.addEventListener('tagline-faded', () => {
-      setTimeout(() => {
-        const scrollTip = document.getElementById('scroll-tip');
-        if (scrollTip && this.current < 50 && scrollTip.style.display !== 'none') {
-          scrollTip.style.opacity = '1';
-        }
-      }, 2000);
-    }, { once: true });
+  _scrollToContact() {
+    window.dispatchEvent(new CustomEvent('skip-intro'));
+
+    const scrollTip = document.getElementById('scroll-tip');
+    if (scrollTip) scrollTip.style.display = 'none';
+
+    if (!this.isEnabled) this._start();
+
+    setTimeout(() => {
+      this.target = this._getMaxScroll();
+    }, 500);
   }
 
   bindContactLink() {
@@ -79,26 +114,7 @@ class HorizontalScroll {
     if (contactLink) {
       contactLink.addEventListener('click', (e) => {
         e.preventDefault();
-        
-        // 1. Dispatch skip event to IntroSequence
-        window.dispatchEvent(new CustomEvent('skip-intro'));
-        
-        // 2. Suppress/Hide scroll tip
-        const scrollTip = document.getElementById('scroll-tip');
-        if (scrollTip) {
-          scrollTip.style.display = 'none';
-          scrollTip.style.opacity = '0';
-        }
-
-        // 3. Ensure physics loop starts if it hasn't
-        if (!this.isEnabled) {
-          this._start();
-        }
-
-        // 4. Autoscroll (Delayed to allow hero screen to sit for a split second)
-        setTimeout(() => {
-          this.target = this._getMaxScroll();
-        }, 500);
+        this._scrollToContact();
       });
     }
   }
@@ -140,7 +156,8 @@ class HorizontalScroll {
       // This makes the swipe feel more natural regardless of exact angle
       const delta = Math.abs(deltaX) > Math.abs(deltaY) ? deltaX : deltaY;
       
-      this.target += delta * 1.5;
+      // Increase sensitivity for a snappier feel
+      this.target += delta * 2.0;
       this.target = Math.max(0, Math.min(this.target, this._getMaxScroll()));
       
       this.touchLastX = touchX;
@@ -205,7 +222,7 @@ class HorizontalScroll {
       }
 
       if (scrollTip && this.current > 10) {
-        scrollTip.style.opacity = '0';
+        scrollTip.classList.add('scroll-tip--hidden');
       }
     }
     requestAnimationFrame(this._animate);

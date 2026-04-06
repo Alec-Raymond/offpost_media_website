@@ -13,20 +13,20 @@ body.scroll-enabled {
   top: 0;
   left: 0;
   width: 100vw;
-  height: 100vh;
+  height: calc(var(--vh, 1vh) * 100);
   overflow: hidden;
 }
 
 #scroll-track {
   display: flex;
-  height: 100vh;
+  height: calc(var(--vh, 1vh) * 100);
   will-change: transform;
 }
 
 .panel {
   flex-shrink: 0;
   width: 100vw;
-  height: 100vh;
+  height: calc(var(--vh, 1vh) * 100);
   position: relative;
   overflow: hidden;
 }
@@ -39,12 +39,13 @@ body.scroll-enabled {
   background: #000;
   overflow: hidden;
   display: flex;
+  height: calc(var(--vh, 1vh) * 100);
 }
 
 .hero-video-wrapper {
   /* Video area always stays locked to full screen width */
   width: 100vw;
-  height: 100vh;
+  height: calc(var(--vh, 1vh) * 100);
   position: relative;
   flex-shrink: 0;
   z-index: 1;
@@ -62,7 +63,7 @@ body.scroll-enabled {
   top: 0;
   left: 0;
   width: 100%;
-  height: 100%;
+  height: calc(var(--vh, 1vh) * 100);
   z-index: 10;
   pointer-events: none;
 }
@@ -89,6 +90,7 @@ body.scroll-enabled {
 .panel--photo {
   /* 90rem at 14px base is ~1.2x screen width */
   width: 90rem; 
+  height: calc(var(--vh, 1vh) * 100);
 }
 
 .panel--photo picture {
@@ -107,6 +109,7 @@ body.scroll-enabled {
 .panel--portrait {
   width: 45rem !important;
   margin-left: 0.5rem;
+  height: calc(var(--vh, 1vh) * 100);
 }
 
 .panel--cta {
@@ -127,7 +130,7 @@ body.scroll-enabled {
 
 .panel__caption {
   position: absolute;
-  bottom: 6rem;
+  bottom: calc(var(--vh, 1vh) * 8);
   left: 4rem;
   color: #fff;
   font-family: 'Oswald', sans-serif;
@@ -163,7 +166,7 @@ body.scroll-enabled {
 /* 3-Photo Grid (1 Top, 2 Bottom) */
 .panel--grid-1-2 {
   width: 100rem !important;
-  height: 100vh !important;
+  height: calc(var(--vh, 1vh) * 100) !important;
   display: flex !important;
   flex-direction: column !important;
   gap: 0.5rem;
@@ -222,20 +225,18 @@ body.scroll-enabled {
   max-width: 35rem;
   text-align: center;
   /* 
-     The magic fix: If the design is too tall for the window, 
-     scale the entire rectangle down proportionally. 
-     This preserves your exact ratio and spacing perfectly.
+     Scale down proportionally ONLY if the screen height is too small to fit the content.
+     This preserves the perfect desktop ratio while preventing cutoff on mobile.
   */
   transform-origin: center center;
-  /* At 1080p design height, 100vh fits it perfectly. 
-     On shorter screens, min(1, ratio) scales it down. */
-  transform: scale(min(1, calc(100vh / 900 * 0.85))); 
+  /* If viewport height < 900px, scale down. Otherwise, scale(1) (no change). */
+  transform: scale(min(1, calc(100vh / 900))); 
 }
 
-/* On very narrow phones, scale it down slightly more to be safe */
-@media (max-width: 480px) {
+/* On very short mobile screens (landscape), scale aggressively to fit */
+@media (max-height: 500px) {
   .contact-content {
-    transform: scale(min(1, calc(100vh / 900 * 0.75)));
+    transform: scale(min(1, calc(100vh / 600)));
   }
 }
 
@@ -310,7 +311,7 @@ body.scroll-enabled {
 /* Staggered 2x2 Grid Panel */
 .panel--grid-4 {
   width: 100rem !important;
-  height: 100vh !important;
+  height: calc(var(--vh, 1vh) * 100) !important;
   display: flex !important;
   flex-direction: row !important;
   gap: 0.5rem;
@@ -355,8 +356,5 @@ body.scroll-enabled {
   position: absolute;
   inset: 0;
   border: 2px solid rgba(255,255,255,0.05);
-  box-shadow:
-    inset 0 0 30px rgba(0,0,0,0.4),
-    inset 0 0 80px rgba(0,0,0,0.2);
   pointer-events: none;
 }

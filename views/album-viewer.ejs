@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= album.title || album.id %> — OFFPOST</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --font-display: 'Oswald', sans-serif;
+      --font-body: 'Roboto', sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      background: #000;
+      color: #fff;
+      font-family: var(--font-body);
+      height: 100%;
+      overflow: hidden;
+      user-select: none;
+    }
+    .viewer {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4rem 3rem;
+    }
+    .viewer-photo {
+      max-width: calc(100vw - 8rem);
+      max-height: calc(100vh - 8rem);
+      width: auto;
+      height: auto;
+      object-fit: contain;
+      border: 4px solid #fff;
+      display: block;
+    }
+    .viewer-photo[src=""] { display: none; }
+    .nav-arrow {
+      position: fixed;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: #fff;
+      font-family: var(--font-display);
+      font-size: 2.5rem;
+      cursor: pointer;
+      padding: 1rem;
+      z-index: 10;
+      transition: opacity 0.3s;
+      opacity: 0.7;
+      line-height: 1;
+    }
+    .nav-arrow:hover { opacity: 1; }
+    .nav-arrow--left { left: 1rem; }
+    .nav-arrow--right { right: 1rem; }
+    .nav-arrow[hidden] { display: none; }
+    .close-btn {
+      position: fixed;
+      top: 1.5rem;
+      right: 2rem;
+      background: none;
+      border: none;
+      color: #fff;
+      font-size: 2rem;
+      cursor: pointer;
+      z-index: 10;
+      opacity: 0.7;
+      transition: opacity 0.3s;
+      font-family: var(--font-display);
+      line-height: 1;
+      text-decoration: none;
+    }
+    .close-btn:hover { opacity: 1; }
+    .photo-counter {
+      position: fixed;
+      bottom: 1.5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: var(--font-body);
+      font-size: 0.75rem;
+      letter-spacing: 0.2em;
+      color: rgba(255,255,255,0.4);
+      z-index: 10;
+    }
+    @media (max-width: 768px) {
+      .viewer { padding: 3rem 1rem; }
+      .viewer-photo {
+        max-width: calc(100vw - 4rem);
+        max-height: calc(100vh - 6rem);
+      }
+      .nav-arrow { font-size: 2rem; padding: 0.5rem; }
+      .nav-arrow--left { left: 0.25rem; }
+      .nav-arrow--right { right: 0.25rem; }
+    }
+  </style>
+</head>
+<body>
+  <a class="close-btn" href="/portfolio">&times;</a>
+
+  <button class="nav-arrow nav-arrow--left" id="prev-btn">&larr;</button>
+  <button class="nav-arrow nav-arrow--right" id="next-btn">&rarr;</button>
+
+  <div class="viewer">
+    <picture id="photo-picture">
+      <source id="source-avif" type="image/avif" srcset="">
+      <source id="source-webp" type="image/webp" srcset="">
+      <img id="photo-img" class="viewer-photo" src="" alt="">
+    </picture>
+  </div>
+
+  <div class="photo-counter" id="counter"></div>
+
+  <script>
+    const albumId = '<%= album.id %>';
+    const photos = <%- JSON.stringify(album.photos) %>;
+    let current = 0;
+
+    const img = document.getElementById('photo-img');
+    const sourceAvif = document.getElementById('source-avif');
+    const sourceWebp = document.getElementById('source-webp');
+    const prevBtn = document.getElementById('prev-btn');
+    const nextBtn = document.getElementById('next-btn');
+    const counter = document.getElementById('counter');
+
+    function showPhoto(index) {
+      current = index;
+      const name = photos[current];
+      const base = `/assets/portfolio/${albumId}`;
+
+      sourceAvif.srcset = `${base}/medium/${name}.avif 1200w, ${base}/full/${name}.avif 2400w`;
+      sourceWebp.srcset = `${base}/medium/${name}.webp 1200w, ${base}/full/${name}.webp 2400w`;
+      img.srcset = `${base}/medium/${name}.jpg 1200w, ${base}/full/${name}.jpg 2400w`;
+      img.sizes = 'calc(100vw - 6rem)';
+      img.src = `${base}/medium/${name}.jpg`;
+      img.alt = `Photo ${current + 1} of ${photos.length}`;
+
+      prevBtn.hidden = current === 0;
+      nextBtn.hidden = current === photos.length - 1;
+      counter.textContent = `${current + 1} / ${photos.length}`;
+    }
+
+    prevBtn.addEventListener('click', () => {
+      if (current > 0) showPhoto(current - 1);
+    });
+
+    nextBtn.addEventListener('click', () => {
+      if (current < photos.length - 1) showPhoto(current + 1);
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft' && current > 0) showPhoto(current - 1);
+      if (e.key === 'ArrowRight' && current < photos.length - 1) showPhoto(current + 1);
+      if (e.key === 'Escape') window.location.href = '/portfolio';
+    });
+
+    // Show first photo
+    showPhoto(0);
+  </script>
+</body>
+</html>

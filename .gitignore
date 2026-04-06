@@ -1,2 +1,4 @@
 .aider*
 oppost_media/
+.env
+node_modules/

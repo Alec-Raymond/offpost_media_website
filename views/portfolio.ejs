@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portfolio — OFFPOST</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/noise.css">
+  <style>
+    :root {
+      --color-bg: #0a0a0a;
+      --color-text: #f0ece4;
+      --font-display: 'Oswald', sans-serif;
+      --font-body: 'Roboto', sans-serif;
+      --cols: 3;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--color-bg);
+      color: var(--color-text);
+      font-family: var(--font-body);
+      min-height: 100vh;
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* --- Header --- */
+    .portfolio-hero {
+      padding: 0.5rem 3vw 0;
+      text-align: center;
+    }
+    .portfolio-brand {
+      color: var(--color-text);
+      text-decoration: none;
+      font-family: var(--font-display);
+      font-size: clamp(3rem, 8vw, 6rem);
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      line-height: 1;
+      display: block;
+      transition: opacity 0.3s;
+    }
+    .portfolio-brand:hover { opacity: 0.6; }
+    .portfolio-subtitle {
+      font-family: var(--font-body);
+      font-weight: 300;
+      font-size: 1.1rem;
+      letter-spacing: 0.4em;
+      color: rgba(255,255,255,0.35);
+      margin-top: 0.6rem;
+      text-transform: uppercase;
+    }
+    .portfolio-divider {
+      width: 60px;
+      height: 1px;
+      background: rgba(255,255,255,0.15);
+      margin: 0.8rem auto 0;
+    }
+
+    /* --- Grid --- */
+    .album-grid {
+      padding: 1.5rem 0.75rem 0;
+      display: grid;
+      grid-template-columns: repeat(var(--cols), 1fr);
+      gap: 0.75rem;
+      margin: 0;
+    }
+    .album-cover {
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+      aspect-ratio: 3/2;
+      text-decoration: none;
+      background: #fff;
+      opacity: 0;
+    }
+    /* Last item on incomplete row spans remaining columns, capped height */
+    .album-cover.span-row {
+      grid-column: 1 / -1;
+      aspect-ratio: auto;
+      max-height: calc((1800px / 3) / 3 * 2 * 2); /* 2x the height of a single cell */
+      height: 50vw; /* responsive fallback */
+      max-height: min(50vw, 600px);
+    }
+    .album-cover img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      opacity: 0;
+      transition: transform 0.6s ease, filter 0.4s ease, opacity 0.8s ease;
+    }
+    .album-cover:hover img {
+      transform: scale(1.03);
+      filter: brightness(0.65);
+    }
+    .album-cover-title {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 1.5rem;
+      font-family: var(--font-display);
+      font-size: 1.4rem;
+      letter-spacing: 0.15em;
+      color: #fff;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.7);
+      background: linear-gradient(transparent, rgba(0,0,0,0.5));
+      opacity: 0;
+      transition: opacity 0.8s ease;
+    }
+    .empty-state {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 10vh 2rem;
+      color: rgba(255,255,255,0.4);
+      font-size: 1.1rem;
+      letter-spacing: 0.1em;
+    }
+
+    /* --- Entrance animation states --- */
+    .album-cover.box-visible {
+      opacity: 1;
+      transition: opacity 0.4s ease;
+    }
+    .album-cover.photo-visible img {
+      opacity: 1;
+    }
+    .album-cover.photo-visible .album-cover-title {
+      opacity: 1;
+    }
+
+    /* --- Footer --- */
+    .portfolio-footer {
+      text-align: center;
+      padding: 2rem 2rem 1.5rem;
+      margin-top: auto;
+    }
+    .portfolio-footer .divider {
+      width: 40px;
+      height: 1px;
+      background: rgba(255,255,255,0.12);
+      margin: 0 auto 2.5rem;
+    }
+    .footer-email {
+      color: var(--color-text);
+      text-decoration: none;
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      letter-spacing: 0.15em;
+      transition: opacity 0.3s;
+    }
+    .footer-email:hover { opacity: 0.6; }
+    .footer-nav {
+      margin-top: 2rem;
+      display: flex;
+      justify-content: center;
+      gap: 2.5rem;
+    }
+    .footer-nav a {
+      color: rgba(255,255,255,0.35);
+      text-decoration: none;
+      font-family: var(--font-display);
+      font-size: 0.75rem;
+      letter-spacing: 0.2em;
+      transition: color 0.3s;
+    }
+    .footer-nav a:hover { color: var(--color-text); }
+    .footer-copy {
+      margin-top: 3rem;
+      font-size: 0.65rem;
+      letter-spacing: 0.1em;
+      color: rgba(255,255,255,0.15);
+    }
+
+    /* --- Responsive --- */
+    @media (max-width: 1024px) {
+      :root { --cols: 2; }
+    }
+    @media (max-width: 768px) {
+      :root { --cols: 2; }
+      .album-grid {
+        padding: 1rem 0.5rem 0;
+        gap: 0.5rem;
+      }
+      .portfolio-hero { padding: 0.5rem 1rem 0; }
+      .portfolio-brand { letter-spacing: 0.15em; }
+      .portfolio-subtitle { font-size: 0.7rem; letter-spacing: 0.3em; }
+      .album-cover-title {
+        font-size: 1rem;
+        padding: 1rem;
+      }
+      .footer-nav { gap: 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+  <div id="noise-overlay" aria-hidden="true"></div>
+
+  <div class="portfolio-hero">
+    <a href="/" class="portfolio-brand">OFFPOST</a>
+    <p class="portfolio-subtitle">Portfolio</p>
+    <div class="portfolio-divider"></div>
+  </div>
+
+  <main class="album-grid">
+    <% if (albums.length === 0) { %>
+      <p class="empty-state">No albums yet.</p>
+    <% } %>
+    <% albums.forEach((album, i) => { %>
+      <% const cover = album.photos[0]; %>
+      <a class="album-cover" href="/album/<%= album.id %>" data-index="<%= i %>">
+        <picture>
+          <source type="image/avif" srcset="/assets/portfolio/<%= album.id %>/thumbs/<%= cover %>.avif 200w, /assets/portfolio/<%= album.id %>/medium/<%= cover %>.avif 1200w, /assets/portfolio/<%= album.id %>/full/<%= cover %>.avif 2400w" sizes="(max-width: 1024px) 50vw, 33vw">
+          <source type="image/webp" srcset="/assets/portfolio/<%= album.id %>/thumbs/<%= cover %>.webp 200w, /assets/portfolio/<%= album.id %>/medium/<%= cover %>.webp 1200w, /assets/portfolio/<%= album.id %>/full/<%= cover %>.webp 2400w" sizes="(max-width: 1024px) 50vw, 33vw">
+          <img
+            src="/assets/portfolio/<%= album.id %>/thumbs/<%= cover %>.jpg"
+            srcset="/assets/portfolio/<%= album.id %>/medium/<%= cover %>.jpg 1200w, /assets/portfolio/<%= album.id %>/full/<%= cover %>.jpg 2400w"
+            sizes="(max-width: 1024px) 50vw, 33vw"
+            alt="<%= album.showTitle && album.title ? album.title : 'Album: ' + album.id %>"
+            loading="lazy">
+        </picture>
+        <% if (album.showTitle && album.title) { %>
+          <div class="album-cover-title"><%= album.title %></div>
+        <% } %>
+      </a>
+    <% }) %>
+  </main>
+
+  <footer class="portfolio-footer">
+    <div class="divider"></div>
+    <a href="mailto:hello@offpost.media" class="footer-email">HELLO@OFFPOST.MEDIA</a>
+    <div class="footer-nav">
+      <a href="/">HOME</a>
+      <a href="https://www.instagram.com/offpostmedia/" target="_blank">INSTAGRAM</a>
+      <a href="/?contact=true">CONTACT</a>
+    </div>
+  </footer>
+
+  <script>
+    // Staggered entrance animation — random order, white box then photo fade
+    document.addEventListener('DOMContentLoaded', () => {
+      const covers = Array.from(document.querySelectorAll('.album-cover'));
+      if (!covers.length) return;
+
+      // Shuffle for random reveal order
+      const shuffled = [...covers].sort(() => Math.random() - 0.5);
+
+      // Dynamically assign span-row based on current column count
+      function updateSpanRow() {
+        const cols = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--cols').trim(), 10);
+        const remainder = covers.length % cols;
+        covers.forEach((cover, i) => {
+          if (i === covers.length - 1 && remainder === 1) {
+            cover.classList.add('span-row');
+          } else {
+            cover.classList.remove('span-row');
+          }
+        });
+      }
+      updateSpanRow();
+      window.addEventListener('resize', updateSpanRow);
+
+      let delay = 200;
+      shuffled.forEach((cover, i) => {
+        // Step 1: Show white box
+        setTimeout(() => {
+          cover.classList.add('box-visible');
+        }, delay);
+
+        // Step 2: Fade in photo on top of white box
+        setTimeout(() => {
+          cover.classList.add('photo-visible');
+        }, delay + 400);
+
+        delay += 180;
+      });
+    });
+  </script>
+</body>
+</html>

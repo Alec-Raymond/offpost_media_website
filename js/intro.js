@@ -128,8 +128,9 @@ class IntroSequence {
         container.style.zIndex = 100 + i;
         container.style.transform = `rotate(${s.rot}deg) scale(0.5) translate(0, 50px)`;
         
+        const baseSrc = this.loader.cache.get(src) || src;
         const img = document.createElement('img');
-        img.src = this.loader.cache.get(src) || src;
+        img.src = baseSrc;
         img.style.width = '100%';
 
         const dots = document.createElement('div');
@@ -176,40 +177,33 @@ class IntroSequence {
 
   slamDown() {
     if (this.video) {
-      this.flash.classList.add('flash-active');
-      this.video.play().catch(() => {
-        this.finishIntroGracefully();
-      });
-      
-      this.overlay.style.backgroundColor = 'transparent';
-      
-      const frost = document.getElementById('frost-overlay');
-      if (frost) frost.remove();
-      
-      if (this.heroBrand) this.heroBrand.style.opacity = '1';
-      if (this.heroTagline) this.heroTagline.style.opacity = '1';
-      if (this.heroLogo) {
-        this.heroLogo.style.opacity = '1';
-        this.heroLogo.style.zIndex = '50';
+      // Safety trigger: Only fallback if it's really stuck (back to 5s for safety but checks state)
+      const safetyTrigger = setTimeout(() => {
+        if (!this.photosShown && (this.video.paused || this.video.currentTime === 0)) {
+          console.warn("Video stuck: forcing photo reveal.");
+          this.handleVideoFailure();
+        }
+      }, 5000);
+
+      const startVisuals = () => {
+        clearTimeout(safetyTrigger);
+        this.flash.classList.add('flash-active');
+        this.revealMainBranding(false);
+      };
+
+      // If already playing due to autoplay attribute, trigger visuals immediately
+      if (!this.video.paused) {
+        startVisuals();
+      } else {
+        this.video.play().then(startVisuals).catch((error) => {
+          console.warn("Autoplay blocked (LPM):", error);
+          clearTimeout(safetyTrigger);
+          this.handleVideoFailure();
+        });
       }
 
-      this.logoContainer.style.opacity = '0';
-
-      const collage = this.overlay.querySelectorAll('.flash-img');
-      collage.forEach(el => {
-        el.style.transition = 'all 0.3s ease-in';
-        el.style.transform += ' translateY(40px)';
-        el.style.opacity = '0';
-        setTimeout(() => { if(el.parentNode) el.remove(); }, 300);
-      });
-
-      this.video.style.transform = 'translateY(-5px)';
-      requestAnimationFrame(() => {
-        this.video.style.transition = 'transform 0.3s cubic-bezier(0.17, 0.89, 0.32, 1)';
-        this.video.style.transform = 'translateY(0)';
-      });
-
       this.video.addEventListener('ended', () => {
+        clearTimeout(safetyTrigger);
         this.video.pause();
         this.video.style.opacity = '0';
         
@@ -222,12 +216,84 @@ class IntroSequence {
         setTimeout(() => this.showPostVideoPhotos(), 500);
       }, { once: true });
     } else {
-      this.finishIntroGracefully();
+      this.handleVideoFailure();
     }
   }
 
+  revealMainBranding(isSlow = false) {
+    const duration = isSlow ? '1.5s' : '0.3s';
+    const timing = isSlow ? 'cubic-bezier(0.22, 1, 0.36, 1)' : 'cubic-bezier(0.17, 0.89, 0.32, 1)';
+
+    this.overlay.style.backgroundColor = 'transparent';
+    const frost = document.getElementById('frost-overlay');
+    if (frost) frost.remove();
+    
+    // Video Descent
+    if (this.video) {
+      this.video.style.transition = 'none';
+      this.video.style.transform = 'translateY(-10px) scale(1.02)';
+      this.video.offsetHeight; // Force reflow
+      this.video.style.transition = `transform ${duration} ${timing}, opacity ${duration} ease`;
+      this.video.style.transform = 'translateY(0) scale(1)';
+    }
+
+    // Branding reveal logic
+    if (this.heroLogo) {
+      this.heroLogo.style.opacity = '1';
+      this.heroLogo.style.zIndex = '50';
+      this.heroLogo.style.transition = 'none';
+      this.heroLogo.style.transform = 'translateY(-10px)'; // Match surgeUp height
+      
+      this.heroLogo.offsetHeight; // Force reflow
+
+      this.heroLogo.style.transition = `opacity ${duration} ease, transform ${duration} ${timing}`;
+      this.heroLogo.style.transform = 'translateY(0)';
+    }
+
+    if (this.heroBrand) this.heroBrand.style.opacity = '1';
+    if (this.heroTagline) this.heroTagline.style.opacity = '1';
+    else window.dispatchEvent(new CustomEvent('tagline-faded'));
+    
+    // Slight delay before hiding intro container to ensure seamless transition
+    setTimeout(() => {
+      if (this.logoContainer) this.logoContainer.style.opacity = '0';
+    }, 100);
+
+    // Clear initial collage smoothly
+    const collage = this.overlay.querySelectorAll('.flash-img');
+    collage.forEach(el => {
+      el.style.transition = `all ${duration} ${timing}`;
+      el.style.transform += ' translateY(40px)';
+      el.style.opacity = '0';
+      setTimeout(() => { if(el.parentNode) el.remove(); }, isSlow ? 1500 : 300);
+    });
+  }
+
+  handleVideoFailure() {
+    if (this.photosShown) return;
+    
+    // Slower, more atmospheric flash for failure
+    this.flash.style.transition = 'opacity 1.0s ease-out';
+    this.flash.style.opacity = '0.8';
+    setTimeout(() => { this.flash.style.opacity = '0'; }, 100);
+
+    this.revealMainBranding(true); // Trigger the slow descent logic
+    
+    this.video.style.opacity = '0';
+    this.video.style.display = 'none';
+    this.finishIntroGracefully();
+    
+    // Wait for the slow branding animation to settle before starting photo reveal
+    setTimeout(() => {
+      this.showPostVideoPhotos();
+    }, 1500);
+  }
+
   finishIntroGracefully() {
-    if (this.overlay && this.overlay.parentNode) this.overlay.remove();
+    if (this.overlay && this.overlay.parentNode) {
+      this.overlay.style.display = 'none';
+      this.overlay.remove();
+    }
     this._enableScroll();
   }
 
@@ -253,22 +319,23 @@ class IntroSequence {
 
     POST_VIDEO_PHOTOS.forEach((src, i) => {
       const show = () => {
+        // Preloaded blob URL is already the best format; fall back to original jpg
         const img = document.createElement('img');
         img.className = 'post-video-photo';
         img.src = this.loader.cache.get(src) || src;
         const pos = positions[i];
-        
+
         if (pos.top) img.style.top = pos.top;
         if (pos.bottom) img.style.bottom = pos.bottom;
         if (pos.left) img.style.left = pos.left;
         if (pos.right) img.style.right = pos.right;
-        
+
         img.style.width = pos.width;
-        img.style.zIndex = '40'; 
+        img.style.zIndex = '40';
         img.style.transform = `rotate(${pos.rot}deg) scale(0.95)`;
-        
+
         if (collageArea) collageArea.appendChild(img);
-        
+
         setTimeout(() => {
           img.style.opacity = 1;
           img.style.transform = `rotate(${pos.rot}deg) scale(1)`;

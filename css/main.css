@@ -9,8 +9,8 @@
   --font-display: 'Oswald', sans-serif;
   --font-body: 'Roboto', sans-serif;
 
-  /* Restored to your preferred base scale */
-  font-size: calc(100vh / 1080 * 16);
+  /* Use the real height calculated by JS, default to 1vh if JS hasn't run */
+  font-size: calc((var(--vh, 1vh) * 100) / 1080 * 16);
 }
 
 html {
@@ -87,6 +87,31 @@ body {
   30%  { opacity: 1; }
   80%  { opacity: 1; }
   100% { opacity: 0; }
+}
+
+/* Scroll Hint */
+.scroll-tip {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  z-index: 1001;
+  font-family: 'Roboto', sans-serif;
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.4);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.8s ease; /* Faster but still smooth fade in */
+}
+
+.scroll-tip--visible {
+  opacity: 1;
+}
+
+.scroll-tip--hidden {
+  opacity: 0 !important;
+  transition: opacity 0.1s ease !important; /* Near-instant fade out */
 }
 
 /* Brand */
