@@ -2,14 +2,14 @@
   "albums": [
     {
       "showTitle": true,
-      "id": "strt",
-      "title": "ars",
+      "id": "at",
+      "title": "ts",
       "photos": [
         {
-          "photo": "assets/portfolio/raw/alec-headshots-edited-3.jpg"
+          "photo": "/assets/portfolio/raw/alec-headshots-edited-6.jpg"
         },
         {
-          "photo": "assets/portfolio/raw/alec-headshots-edited-6.jpg"
+          "photo": "/assets/portfolio/raw/alec-headshots-edited-3.jpg"
         }
       ]
     }
