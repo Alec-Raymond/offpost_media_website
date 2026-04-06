@@ -28,6 +28,16 @@
           "photo": "assets/portfolio/raw/dsc07267.jpg"
         }
       ]
+    },
+    {
+      "showTitle": true,
+      "title": "stra",
+      "id": "arst",
+      "photos": [
+        {
+          "photo": "assets/portfolio/raw/dsc07298.jpg"
+        }
+      ]
     }
   ]
 }
