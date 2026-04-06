@@ -22,8 +22,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Decap saves path as: assets/portfolio/ALBUM_ID/raw/IMAGE.jpg
         const photoPath = typeof firstPhoto === 'object' ? firstPhoto.photo : firstPhoto;
         const parts = photoPath.split('/');
-        // The photo name is the last part before the extension
-        coverPhoto = parts.pop().split('.')[0];
+        // The photo name is the last part before the extension, properly sanitized to match the build script
+        coverPhoto = parts.pop().split('.')[0].toLowerCase().replace(/[^a-z0-9_-]/g, '_');
       }
 
       const albumEl = document.createElement('a');

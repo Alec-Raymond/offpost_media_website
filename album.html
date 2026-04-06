@@ -129,7 +129,7 @@
 
         photos = album.photos.map(p => {
           const photoPath = typeof p === 'object' ? p.photo : p;
-          return photoPath.split('/').pop().split('.')[0];
+          return photoPath.split('/').pop().split('.')[0].toLowerCase().replace(/[^a-z0-9_-]/g, '_');
         });
       } catch (err) {
         console.error('Failed to load album:', err);
