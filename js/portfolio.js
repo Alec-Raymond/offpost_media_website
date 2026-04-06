@@ -59,7 +59,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 function updateSpanRow() {
   const covers = Array.from(document.querySelectorAll('.album-cover'));
   if (!covers.length) return;
-  const cols = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--cols').trim(), 10);
+  // Read actual column count from the computed grid
+  const grid = document.getElementById('album-grid');
+  const cols = getComputedStyle(grid).gridTemplateColumns.split(' ').length;
   const remainder = covers.length % cols;
   covers.forEach((cover, i) => {
     if (i === covers.length - 1 && remainder === 1) {
