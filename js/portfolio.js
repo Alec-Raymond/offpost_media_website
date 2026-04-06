@@ -43,6 +43,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       grid.appendChild(albumEl);
     });
 
+    // Dynamically assign span-row based on current column count
+    updateSpanRow();
+    window.addEventListener('resize', updateSpanRow);
+
     // Run entrance animations
     animateGrid();
 
@@ -51,6 +55,20 @@ document.addEventListener('DOMContentLoaded', async () => {
     grid.innerHTML = '<p class="empty-state">Error loading portfolio. Please try again later.</p>';
   }
 });
+
+function updateSpanRow() {
+  const covers = Array.from(document.querySelectorAll('.album-cover'));
+  if (!covers.length) return;
+  const cols = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--cols').trim(), 10);
+  const remainder = covers.length % cols;
+  covers.forEach((cover, i) => {
+    if (i === covers.length - 1 && remainder === 1) {
+      cover.classList.add('span-row');
+    } else {
+      cover.classList.remove('span-row');
+    }
+  });
+}
 
 function animateGrid() {
   const covers = Array.from(document.querySelectorAll('.album-cover'));
