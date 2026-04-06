@@ -2,13 +2,13 @@ backend:
   name: git-gateway
   branch: main
 
-media_folder: "assets/portfolio/raw"
-public_folder: "/assets/portfolio/raw"
+media_folder: "assets/portfolio"
+public_folder: "/assets/portfolio"
 
 collections:
   - name: "portfolio"
     label: "Portfolio Data"
-    delete: false # Prevent accidental deletion of the main file
+    delete: false
     files:
       - name: "albums_list"
         label: "Manage Albums"
@@ -29,4 +29,9 @@ collections:
                 widget: "list"
                 summary: "{{fields.photo}}"
                 fields:
-                  - {label: "Photo", name: "photo", widget: "image", media_folder: "assets/portfolio/{{fields.id}}/raw"}
+                  - label: "Photo"
+                    name: "photo"
+                    widget: "image"
+                    # This ensures photos go to assets/portfolio/ALBUM_ID/raw/
+                    media_folder: "assets/portfolio/{{id}}/raw"
+                    public_folder: "/assets/portfolio/{{id}}/raw"

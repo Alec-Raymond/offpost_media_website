@@ -115,7 +115,6 @@
         grid.innerHTML = ''; // Clear loading
 
         album.photos.forEach(photo => {
-          // Normalize photo name
           const photoPath = typeof photo === 'object' ? photo.photo : photo;
           const name = photoPath.split('/').pop().split('.')[0];
 

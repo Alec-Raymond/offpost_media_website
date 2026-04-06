@@ -15,14 +15,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     grid.innerHTML = ''; // Clear loading state
 
     albums.forEach((album, i) => {
-      // The CMS saves paths as "assets/portfolio/ID/raw/name.jpg"
-      // We need just the base name for our thumb/medium/full folders
       let coverPhoto = 'default';
+      
       if (album.photos && album.photos.length > 0) {
         const firstPhoto = album.photos[0];
-        // Handle both string names and Decap CMS path objects
+        // Decap saves path as: assets/portfolio/ALBUM_ID/raw/IMAGE.jpg
         const photoPath = typeof firstPhoto === 'object' ? firstPhoto.photo : firstPhoto;
-        coverPhoto = photoPath.split('/').pop().split('.')[0];
+        const parts = photoPath.split('/');
+        // The photo name is the last part before the extension
+        coverPhoto = parts.pop().split('.')[0];
       }
 
       const albumEl = document.createElement('a');
