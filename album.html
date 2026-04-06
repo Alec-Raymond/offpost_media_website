@@ -121,9 +121,9 @@
           const container = document.createElement('div');
           container.innerHTML = `
             <picture>
-              <source type="image/avif" srcset="assets/portfolio/${album.id}/medium/${name}.avif 1200w, assets/portfolio/${album.id}/full/${name}.avif 2400w" sizes="100vw">
-              <source type="image/webp" srcset="assets/portfolio/${album.id}/medium/${name}.webp 1200w, assets/portfolio/${album.id}/full/${name}.webp 2400w" sizes="100vw">
-              <img src="assets/portfolio/${album.id}/medium/${name}.jpg" srcset="assets/portfolio/${album.id}/full/${name}.jpg 2400w" sizes="100vw" class="viewer-photo" loading="lazy">
+              <source type="image/avif" srcset="assets/portfolio/medium/${name}.avif 1200w, assets/portfolio/full/${name}.avif 2400w" sizes="100vw">
+              <source type="image/webp" srcset="assets/portfolio/medium/${name}.webp 1200w, assets/portfolio/full/${name}.webp 2400w" sizes="100vw">
+              <img src="assets/portfolio/medium/${name}.jpg" srcset="assets/portfolio/full/${name}.jpg 2400w" sizes="100vw" class="viewer-photo" loading="lazy">
             </picture>
           `;
           grid.appendChild(container);

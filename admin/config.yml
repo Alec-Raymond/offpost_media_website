@@ -33,6 +33,7 @@ collections:
                   - label: "Photo"
                     name: "photo"
                     widget: "image"
-                    # Correct way to target the subfolder in Decap
-                    media_folder: "assets/portfolio/{{id}}/raw"
-                    public_folder: "assets/portfolio/{{id}}/raw"
+                    # Decap doesn't support {{id}} inside a list in a file collection.
+                    # All photos will save globally to raw, and our script will organize them.
+                    media_folder: "assets/portfolio/raw"
+                    public_folder: "assets/portfolio/raw"

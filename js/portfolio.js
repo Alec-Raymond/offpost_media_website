@@ -33,9 +33,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       albumEl.innerHTML = `
         <picture>
-          <source type="image/avif" srcset="assets/portfolio/${album.id}/thumbs/${coverPhoto}.avif 200w, assets/portfolio/${album.id}/medium/${coverPhoto}.avif 1200w" sizes="(max-width: 1024px) 50vw, 33vw">
-          <source type="image/webp" srcset="assets/portfolio/${album.id}/thumbs/${coverPhoto}.webp 200w, assets/portfolio/${album.id}/medium/${coverPhoto}.webp 1200w" sizes="(max-width: 1024px) 50vw, 33vw">
-          <img src="assets/portfolio/${album.id}/thumbs/${coverPhoto}.jpg" alt="${album.title || album.id}" loading="lazy">
+          <source type="image/avif" srcset="assets/portfolio/thumbs/${coverPhoto}.avif 200w, assets/portfolio/medium/${coverPhoto}.avif 1200w" sizes="(max-width: 1024px) 50vw, 33vw">
+          <source type="image/webp" srcset="assets/portfolio/thumbs/${coverPhoto}.webp 200w, assets/portfolio/medium/${coverPhoto}.webp 1200w" sizes="(max-width: 1024px) 50vw, 33vw">
+          <img src="assets/portfolio/thumbs/${coverPhoto}.jpg" alt="${album.title || album.id}" loading="lazy">
         </picture>
         ${album.showTitle && album.title ? `<div class="album-cover-title">${album.title}</div>` : ''}
       `;
