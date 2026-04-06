@@ -12,6 +12,22 @@
       ],
       "id": "trsat",
       "title": "st"
+    },
+    {
+      "showTitle": true,
+      "id": "fpw",
+      "title": "qq",
+      "photos": [
+        {
+          "photo": "assets/portfolio/raw/ma-77409-1-.webp"
+        },
+        {
+          "photo": "assets/portfolio/raw/dsc07298.jpg"
+        },
+        {
+          "photo": "assets/portfolio/raw/dsc07267.jpg"
+        }
+      ]
     }
   ]
 }
