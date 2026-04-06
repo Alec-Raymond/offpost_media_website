@@ -145,9 +145,9 @@
         current = index;
         const name = photos[current];
         picture.innerHTML = `
-          <source type="image/avif" srcset="/assets/portfolio/medium/${name}.avif 1200w, /assets/portfolio/full/${name}.avif 2400w" sizes="calc(100vw - 6rem)">
-          <source type="image/webp" srcset="/assets/portfolio/medium/${name}.webp 1200w, /assets/portfolio/full/${name}.webp 2400w" sizes="calc(100vw - 6rem)">
-          <img src="/assets/portfolio/medium/${name}.jpg" srcset="/assets/portfolio/medium/${name}.jpg 1200w, /assets/portfolio/full/${name}.jpg 2400w" sizes="calc(100vw - 6rem)" class="viewer-photo" alt="Photo ${current + 1} of ${photos.length}">
+          <source type="image/avif" srcset="assets/portfolio/medium/${name}.avif 1200w, assets/portfolio/full/${name}.avif 2400w" sizes="calc(100vw - 6rem)">
+          <source type="image/webp" srcset="assets/portfolio/medium/${name}.webp 1200w, assets/portfolio/full/${name}.webp 2400w" sizes="calc(100vw - 6rem)">
+          <img src="assets/portfolio/medium/${name}.jpg" srcset="assets/portfolio/medium/${name}.jpg 1200w, assets/portfolio/full/${name}.jpg 2400w" sizes="calc(100vw - 6rem)" class="viewer-photo" alt="Photo ${current + 1} of ${photos.length}">
         `;
         counter.textContent = `${current + 1} / ${photos.length}`;
         prevBtn.style.display = current === 0 ? 'none' : '';
