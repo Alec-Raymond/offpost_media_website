@@ -1,0 +1,35 @@
+backend:
+  name: github
+  repo: Alec-Raymond/offpost_media_website
+  branch: main
+  base_url: https://api.github.com
+  # Use Netlify Identity for easy login (can also use GitHub OAuth)
+  auth_type: implicit
+
+media_folder: "assets/portfolio/raw"
+public_folder: "/assets/portfolio/raw"
+
+collections:
+  - name: "albums"
+    label: "Portfolio Albums"
+    label_singular: "Album"
+    file: "albums.json"
+    extension: "json"
+    format: "json"
+    fields:
+      - name: "albums"
+        label: "Manage Albums"
+        widget: "list"
+        summary: "{{fields.title}} (ID: {{fields.id}})"
+        add_to_top: false
+        # This list widget allows drag-and-drop reordering!
+        fields:
+          - {label: "Album ID (Lowercase, no spaces)", name: "id", widget: "string"}
+          - {label: "Album Title", name: "title", widget: "string"}
+          - {label: "Show Title on Cover?", name: "showTitle", widget: "boolean", default: true}
+          - label: "Photos"
+            name: "photos"
+            widget: "list"
+            summary: "{{fields.photo}}"
+            # This nested list lets them upload/pick multiple photos
+            field: {label: "Photo", name: "photo", widget: "image", media_folder: "assets/portfolio/{{fields.id}}/raw"}

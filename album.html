@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Album — OFFPOST</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/noise.css">
+  <style>
+    :root {
+      --color-bg: #0a0a0a;
+      --color-text: #f0ece4;
+      --font-display: 'Oswald', sans-serif;
+      --font-body: 'Roboto', sans-serif;
+    }
+    body {
+      background: var(--color-bg);
+      color: var(--color-text);
+      font-family: var(--font-body);
+      min-height: 100vh;
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    .viewer-header {
+      padding: 1.5rem 3vw;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: fixed;
+      top: 0;
+      width: 100%;
+      z-index: 100;
+      background: linear-gradient(rgba(10,10,10,0.8), transparent);
+    }
+    .back-link {
+      color: var(--color-text);
+      text-decoration: none;
+      font-family: var(--font-display);
+      font-size: 0.8rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      opacity: 0.5;
+      transition: opacity 0.3s;
+    }
+    .back-link:hover { opacity: 1; }
+    
+    .viewer-grid {
+      padding-top: 10vh;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      width: 100%;
+    }
+    .viewer-photo {
+      width: 100%;
+      height: auto;
+      display: block;
+      background: #111;
+    }
+    .album-title-overlay {
+      position: fixed;
+      bottom: 2rem;
+      left: 3vw;
+      z-index: 100;
+      font-family: var(--font-display);
+      font-size: clamp(1.5rem, 4vw, 3rem);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      pointer-events: none;
+      text-shadow: 0 4px 20px rgba(0,0,0,0.8);
+    }
+  </style>
+</head>
+<body>
+  <div id="noise-overlay" aria-hidden="true"></div>
+
+  <header class="viewer-header">
+    <a href="portfolio.html" class="back-link">← Portfolio</a>
+    <a href="index.html" class="back-link">Home</a>
+  </header>
+
+  <h1 id="album-title" class="album-title-overlay"></h1>
+
+  <main id="viewer-grid" class="viewer-grid">
+    <p style="text-align:center; padding: 20vh; opacity:0.3;">Loading photos...</p>
+  </main>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const grid = document.getElementById('viewer-grid');
+      const titleEl = document.getElementById('album-title');
+      const params = new URLSearchParams(window.location.search);
+      const albumId = params.get('id');
+
+      if (!albumId) {
+        window.location.href = 'portfolio.html';
+        return;
+      }
+
+      try {
+        const response = await fetch('albums.json');
+        const data = await response.json();
+        const album = data.albums.find(a => a.id === albumId);
+
+        if (!album) {
+          grid.innerHTML = '<p style="text-align:center; padding: 20vh;">Album not found.</p>';
+          return;
+        }
+
+        titleEl.textContent = album.title || '';
+        grid.innerHTML = ''; // Clear loading
+
+        album.photos.forEach(photo => {
+          // Normalize photo name
+          const photoPath = typeof photo === 'object' ? photo.photo : photo;
+          const name = photoPath.split('/').pop().split('.')[0];
+
+          const container = document.createElement('div');
+          container.innerHTML = `
+            <picture>
+              <source type="image/avif" srcset="assets/portfolio/${album.id}/medium/${name}.avif 1200w, assets/portfolio/${album.id}/full/${name}.avif 2400w" sizes="100vw">
+              <source type="image/webp" srcset="assets/portfolio/${album.id}/medium/${name}.webp 1200w, assets/portfolio/${album.id}/full/${name}.webp 2400w" sizes="100vw">
+              <img src="assets/portfolio/${album.id}/medium/${name}.jpg" srcset="assets/portfolio/${album.id}/full/${name}.jpg 2400w" sizes="100vw" class="viewer-photo" loading="lazy">
+            </picture>
+          `;
+          grid.appendChild(container);
+        });
+
+      } catch (err) {
+        console.error('Failed to load album:', err);
+        grid.innerHTML = '<p style="text-align:center; padding: 20vh;">Error loading photos.</p>';
+      }
+    });
+  </script>
+</body>
+</html>

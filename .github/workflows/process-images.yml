@@ -1,0 +1,37 @@
+name: Process Portfolio Images
+
+on:
+  push:
+    paths:
+      - 'assets/portfolio/**/raw/**'
+      - 'albums.json'
+
+jobs:
+  optimize:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Sharp
+        run: npm install sharp
+
+      - name: Process Images
+        # This script (which we'll write next) will find any new raw images
+        # and create the thumbs, medium, and full sizes in AVIF/WebP/JPG.
+        run: node scripts/process-images-static.js
+
+      - name: Commit Optimized Images
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add assets/portfolio/
+          git commit -m "Optimize portfolio images [skip ci]" || echo "No changes to commit"
+          git push
