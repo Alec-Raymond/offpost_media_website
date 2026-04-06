@@ -1,41 +1,42 @@
 {
   "albums": [
     {
-      "id": "fpw",
-      "title": "qq",
+      "id": "skate",
+      "title": "SKATE",
       "showTitle": true,
       "photos": [
         {
-          "photo": "assets/portfolio/raw/ma-77409-1-.webp"
-        },
-        {
-          "photo": "assets/portfolio/raw/dsc07298.jpg"
-        },
-        {
-          "photo": "assets/portfolio/raw/dsc07267.jpg"
+          "photo": "assets/portfolio/raw/img_6900.webp"
         }
       ]
     },
     {
-      "id": "aasta",
-      "title": "strast",
+      "id": "fun",
+      "title": "FUN",
       "showTitle": true,
       "photos": [
         {
-          "photo": "assets/portfolio/raw/DSC07922.jpg"
+          "photo": "assets/portfolio/raw/img_6989.avif"
         }
       ]
     },
     {
-      "id": "ast",
-      "title": "tsra",
+      "id": "surf",
+      "title": "SURF",
       "showTitle": true,
       "photos": [
         {
-          "photo": "assets/portfolio/raw/DSC07259.jpg"
-        },
+          "photo": "assets/portfolio/raw/img_6807.avif"
+        }
+      ]
+    },
+    {
+      "id": "ocean",
+      "title": "OCEAN",
+      "showTitle": true,
+      "photos": [
         {
-          "photo": "assets/portfolio/raw/DSC07116.jpg"
+          "photo": "assets/portfolio/raw/img_7300.webp"
         }
       ]
     }
