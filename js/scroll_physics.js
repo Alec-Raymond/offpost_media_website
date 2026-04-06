@@ -42,7 +42,7 @@ class HorizontalScroll {
         if (scrollTip && this.target < 50) {
           scrollTip.classList.add('scroll-tip--visible');
         }
-      }, 4000);
+      }, 7000);
     };
 
     window.addEventListener('tagline-faded', showHint, { once: true });
