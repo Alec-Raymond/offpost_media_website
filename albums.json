@@ -1,17 +1,3 @@
 {
-  "albums": [
-    {
-      "showTitle": true,
-      "id": "s",
-      "title": "ra",
-      "photos": [
-        {
-          "photo": "assets/portfolio/raw/alec-headshots-edited-3.jpg"
-        },
-        {
-          "photo": "assets/portfolio/raw/alec-headshots-edited-6.jpg"
-        }
-      ]
-    }
-  ]
+  "albums": []
 }
