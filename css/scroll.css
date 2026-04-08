@@ -209,33 +209,121 @@ body.scroll-enabled {
   display: block;
 }
 
+/* About Panel Section — identical sizing to .panel--contact */
+.panel--about {
+  width: 40rem !important;
+  max-width: 100vw;
+  background: var(--color-bg);
+  display: flex !important;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 5vh 0.75rem 5vh 2rem;
+  overflow: hidden;
+  position: relative;
+}
+
+.about-content {
+  width: 100%;
+  max-width: min(35rem, calc(100vw - 1.5rem));
+  text-align: left;
+  transform-origin: left center;
+  transform: scale(min(1, calc(100vh / 900)));
+  position: relative;
+}
+
+.about-rule {
+  width: 60px;
+  height: 1px;
+  background: rgba(255,255,255,0.2);
+  margin: 0 auto 1.5rem;
+}
+
+.about-content p {
+  font-family: var(--font-body);
+  font-weight: 300;
+  font-size: 1.15rem;
+  line-height: 1.7;
+  color: rgba(255,255,255,0.7);
+  margin: 0 0 0.8rem;
+  letter-spacing: 0.02em;
+}
+
+.about-name {
+  font-family: var(--font-display) !important;
+  font-weight: 400 !important;
+  font-size: 1rem !important;
+  letter-spacing: 0.2em !important;
+  color: var(--color-text) !important;
+  margin-bottom: 1rem !important;
+  text-align: right;
+}
+
+.about-image {
+  width: 100%;
+  height: auto;
+  margin-top: 0.5rem;
+  margin-bottom: 0;
+  border: 4px solid #fff;
+}
+
+.about-email {
+  display: block;
+  text-align: center;
+  font-size: 1.2rem;
+  color: rgba(255,255,255,0.5);
+  text-decoration: none;
+  font-family: var(--font-display);
+  letter-spacing: 0.1em;
+  margin-top: 1rem;
+  text-transform: uppercase;
+  transition: color 0.3s;
+}
+
+.about-email:hover {
+  color: rgba(255,255,255,0.8);
+}
+
+.about-credit {
+  display: block;
+  position: absolute;
+  bottom: 0.75rem;
+  left: 0.75rem;
+  font-family: var(--font-body);
+  font-size: 0.7rem;
+  color: rgba(255,255,255,0.25);
+  letter-spacing: 0.05em;
+  text-decoration: none;
+  transition: color 0.3s;
+}
+
+.about-credit:hover {
+  color: rgba(255,255,255,0.5);
+}
+
 /* Contact Panel Section */
 .panel--contact {
-  /* Reduced from 45rem to 40rem to half the side margins around the 35rem content */
   width: 40rem !important;
+  max-width: 100vw;
   background: var(--color-bg);
   display: flex !important;
   align-items: center;
   justify-content: center;
   padding: 5vh 0.75rem;
+  overflow: hidden;
 }
 
 .contact-content {
   width: 100%;
-  max-width: 35rem;
+  max-width: min(35rem, calc(100vw - 1.5rem));
   text-align: center;
-  /* 
-     Scale down proportionally ONLY if the screen height is too small to fit the content.
-     This preserves the perfect desktop ratio while preventing cutoff on mobile.
-  */
   transform-origin: center center;
-  /* If viewport height < 900px, scale down. Otherwise, scale(1) (no change). */
-  transform: scale(min(1, calc(100vh / 900))); 
+  transform: scale(min(1, calc(100vh / 900)));
 }
 
 /* On very short mobile screens (landscape), scale aggressively to fit */
 @media (max-height: 500px) {
-  .contact-content {
+  .contact-content,
+  .about-content {
     transform: scale(min(1, calc(100vh / 600)));
   }
 }
@@ -286,6 +374,13 @@ body.scroll-enabled {
 
 .contact-content button:hover {
   opacity: 0.8;
+}
+
+/* Prevent hover state from sticking on touch devices */
+@media (hover: none) {
+  .contact-content button:hover {
+    opacity: 1;
+  }
 }
 
 .contact-socials {
@@ -348,6 +443,18 @@ body.scroll-enabled {
   height: 100%;
   object-fit: cover;
   display: block;
+}
+
+@media (max-width: 768px) {
+  .panel--grid-1-2 {
+    width: calc(300vw + 1rem) !important;
+  }
+  .panel--grid-4 {
+    width: calc(100vw / 0.42 + 0.5rem) !important;
+  }
+  .panel--portrait {
+    width: 100vw !important;
+  }
 }
 
 /* Grunge accents — rough borders on panels */

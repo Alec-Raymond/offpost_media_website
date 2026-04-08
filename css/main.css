@@ -50,17 +50,50 @@ body {
   font-size: clamp(12px, 0.8rem, 16px);
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  transition: opacity 0.3s;
+  transition: color 0.15s;
 }
 
 #main-nav a:hover {
-  opacity: 0.6;
+  color: rgba(255,255,255,0.5);
+}
+
+@media (hover: none) {
+  #main-nav a:hover {
+    color: var(--color-text);
+  }
 }
 
 .nav-brand {
   font-size: clamp(14px, 1rem, 20px) !important;
   font-weight: 700;
-  letter-spacing: 0.3em !important;
+  letter-spacing: 0.3em;
+  display: inline-flex !important;
+  align-items: baseline;
+  opacity: 0;
+  transition: opacity 0.5s ease, color 0.15s;
+}
+
+.nav-brand--visible {
+  opacity: 1;
+}
+
+.nav-about-letters {
+  display: contents;
+}
+
+.nav-about-letters span {
+  display: inline-block;
+  width: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition: none;
+  letter-spacing: 0.1em;
+}
+
+.nav-about-letters .about-space {
+  width: 0;
+  opacity: 1;
+  letter-spacing: 0;
 }
 
 .nav-links {
@@ -118,12 +151,25 @@ body {
 .brand {
   font-family: var(--font-display);
   /* Use vw for width-responsiveness so it never overflows narrow screens */
-  font-size: clamp(4rem, 15vw, 10rem); 
+  font-size: clamp(4rem, 15vw, 10rem);
   font-weight: 700;
   letter-spacing: 0.15em;
   line-height: 0.9;
   margin: 0;
   text-transform: uppercase;
+  cursor: pointer;
+  pointer-events: auto;
+  transition: color 0.15s;
+}
+
+.brand:hover {
+  color: rgba(255,255,255,0.5);
+}
+
+@media (hover: none) {
+  .brand:hover {
+    color: inherit;
+  }
 }
 
 .tagline {
