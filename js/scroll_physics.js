@@ -245,77 +245,85 @@ class HorizontalScroll {
       const navBrand = document.querySelector('.nav-brand');
       const scrollTip = document.getElementById('scroll-tip');
 
+      const heroStart = this.heroOffset || 0;
       if (navBrand) {
-        const heroStart = this.heroOffset || 0;
-        const shouldShow = this.current > heroStart + window.innerWidth * 0.69 || this.current < heroStart - 10;
-        if (shouldShow && !navBrand.classList.contains('nav-brand--visible')) {
-          navBrand.classList.add('nav-brand--visible');
-        } else if (!shouldShow && navBrand.classList.contains('nav-brand--visible')) {
-          navBrand.classList.remove('nav-brand--visible');
-        }
+        const shouldShow = this.current > heroStart + window.innerWidth * 0.69 || this.current < heroStart - 100;
+        // Fade opacity manually since mix-blend-mode kills CSS transitions
+        if (!this._navBrandOpacity) this._navBrandOpacity = 0;
+        const targetOpacity = shouldShow ? 1 : 0;
+        this._navBrandOpacity += (targetOpacity - this._navBrandOpacity) * 0.15;
+        if (Math.abs(this._navBrandOpacity - targetOpacity) < 0.01) this._navBrandOpacity = targetOpacity;
+        navBrand.style.opacity = this._navBrandOpacity;
 
-        // Reveal "ABOUT " letters one at a time as user scrolls left toward about panel
-        if (!this._aboutLetters) {
-          this._aboutLetters = navBrand.querySelectorAll('.nav-about-letters span');
-          // Measure each letter's natural width once
-          this._aboutLetterWidths = [];
-          this._aboutLetters.forEach(span => {
-            span.style.width = 'auto';
-            span.style.opacity = '1';
-            this._aboutLetterWidths.push(span.offsetWidth);
-            span.style.width = '0';
-            span.style.opacity = '0';
-          });
-        }
-
-        const letterCount = this._aboutLetters.length;
-        // Only start revealing in the last 40% of the scroll toward the about panel
-        const rawProgress = Math.max(0, Math.min(1, 1 - (this.current / heroStart)));
-        const progress = Math.max(0, (rawProgress - 0.6) / 0.4);
-
-        let totalRevealedWidth = 0;
-        for (let i = 0; i < letterCount; i++) {
-          const letterStart = i / letterCount;
-          const letterEnd = (i + 1) / letterCount;
-          const letterProgress = Math.max(0, Math.min(1, (progress - letterStart) / (letterEnd - letterStart)));
-
-          const revealedWidth = letterProgress * this._aboutLetterWidths[i];
-          totalRevealedWidth += revealedWidth;
-          this._aboutLetters[i].style.width = `${revealedWidth}px`;
-          // Only start fading in during the last 20% of the letter's width expansion
-          const fadeProgress = Math.max(0, (letterProgress - 0.8) / 0.2);
-          this._aboutLetters[i].style.opacity = fadeProgress;
-        }
-
-        // Scale up the nav brand, anchored from the left
-        const scale = 1 + progress * 2;
-        // Tighten letter-spacing as it scales up
-        const spacing = 0.3 - progress * 0.2;
-        navBrand.style.letterSpacing = `${spacing}em`;
-        navBrand.style.transformOrigin = 'left center';
-        const yShift = window.innerWidth < 768 ? 3 : 2;
-        navBrand.style.transform = `translateX(-${totalRevealedWidth * 0.2}px) translateY(${progress * yShift}rem) scale(${scale})`;
-
-        // Disable nav brand click when about is showing
-        navBrand.style.pointerEvents = progress > 0 ? 'none' : '';
-
-        // Move nav links to left on mobile only
-        const navLinks = document.querySelector('.nav-links');
-        if (navLinks) {
-          if (window.innerWidth < 768 && progress > 0) {
-            const navLinksLeft = navLinks.offsetLeft;
-            const navPadding = navBrand.offsetLeft;
-            const targetX = navPadding - navLinksLeft;
-            navLinks.style.transform = `translateX(${progress * targetX}px)`;
-          } else {
-            navLinks.style.transform = '';
+        // Only process letter reveals and transforms when the brand is visible or fading
+        if (this._navBrandOpacity > 0.01) {
+          // Reveal "ABOUT " letters one at a time as user scrolls left toward about panel
+          if (!this._aboutLetters) {
+            this._aboutLetters = navBrand.querySelectorAll('.nav-about-letters span');
+            // Measure each letter's natural width once
+            this._aboutLetterWidths = [];
+            this._aboutLetters.forEach(span => {
+              span.style.width = 'auto';
+              span.style.opacity = '1';
+              this._aboutLetterWidths.push(span.offsetWidth);
+              span.style.width = '0';
+              span.style.opacity = '0';
+            });
           }
-        }
 
+          const letterCount = this._aboutLetters.length;
+          // Only start revealing in the last 40% of the scroll toward the about panel
+          const rawProgress = Math.max(0, Math.min(1, 1 - (this.current / heroStart)));
+          const progress = Math.max(0, (rawProgress - 0.6) / 0.4);
+
+          let totalRevealedWidth = 0;
+          for (let i = 0; i < letterCount; i++) {
+            const letterStart = i / letterCount;
+            const letterEnd = (i + 1) / letterCount;
+            const letterProgress = Math.max(0, Math.min(1, (progress - letterStart) / (letterEnd - letterStart)));
+
+            const revealedWidth = letterProgress * this._aboutLetterWidths[i];
+            totalRevealedWidth += revealedWidth;
+            this._aboutLetters[i].style.width = `${revealedWidth}px`;
+            // Only start fading in during the last 20% of the letter's width expansion
+            const fadeProgress = Math.max(0, (letterProgress - 0.8) / 0.2);
+            this._aboutLetters[i].style.opacity = fadeProgress;
+          }
+
+          // Scale up the nav brand, anchored from the left
+          const scale = 1 + progress * 2;
+          // Tighten letter-spacing as it scales up
+          const spacing = 0.3 - progress * 0.2;
+          if (progress > 0) {
+            navBrand.style.letterSpacing = `${spacing}em`;
+            navBrand.style.transformOrigin = 'left center';
+            const yShift = window.innerWidth < 768 ? 3 : 2;
+            navBrand.style.transform = `translateX(-${totalRevealedWidth * 0.2}px) translateY(${progress * yShift}rem) scale(${scale})`;
+            navBrand.style.pointerEvents = 'none';
+          } else {
+            navBrand.style.letterSpacing = '';
+            navBrand.style.transform = '';
+            navBrand.style.pointerEvents = '';
+          }
+
+          // Move nav links to left on mobile only
+          const navLinks = document.querySelector('.nav-links');
+          if (navLinks) {
+            if (window.innerWidth < 768 && progress > 0) {
+              const navLinksLeft = navLinks.offsetLeft;
+              const navPadding = navBrand.offsetLeft;
+              const targetX = navPadding - navLinksLeft;
+              navLinks.style.transform = `translateX(${progress * targetX}px)`;
+            } else {
+              navLinks.style.transform = '';
+            }
+          }
+        } // end shouldShow || wasVisible
 
         // Translate the hero OFFPOST logo off-screen — starts slow, accelerates
+        const heroRawProgress = Math.max(0, Math.min(1, 1 - (this.current / heroStart)));
         const heroLogo = document.getElementById('hero-logo-overlay');
-        const lateProgress = Math.max(0, Math.min(1, (rawProgress - 0.65) / 0.35));
+        const lateProgress = Math.max(0, Math.min(1, (heroRawProgress - 0.65) / 0.35));
         if (heroLogo) {
           if (lateProgress > 0) {
             const eased = lateProgress * lateProgress * lateProgress;

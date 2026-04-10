@@ -241,7 +241,7 @@ body.scroll-enabled {
 .about-content p {
   font-family: var(--font-body);
   font-weight: 300;
-  font-size: 1.15rem;
+  font-size: 1rem;
   line-height: 1.7;
   color: rgba(255,255,255,0.7);
   margin: 0 0 0.8rem;
@@ -269,12 +269,12 @@ body.scroll-enabled {
 .about-email {
   display: block;
   text-align: center;
-  font-size: 1.2rem;
-  color: rgba(255,255,255,0.5);
+  font-size: 1.4rem;
+  color: #fff;
   text-decoration: none;
   font-family: var(--font-display);
   letter-spacing: 0.1em;
-  margin-top: 1rem;
+  margin-top: 2rem;
   text-transform: uppercase;
   transition: color 0.3s;
 }

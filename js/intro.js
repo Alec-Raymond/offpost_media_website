@@ -33,20 +33,124 @@ class IntroSequence {
     this.audio = new ProjectorAudio('assets/audio/projector.mp3');
     this.isStarted = false;
     this.photosShown = false;
+
+    // On mobile portrait, swap to vertical video before autoplay kicks in
+    this.isMobile = window.innerWidth < 768 && window.innerHeight > window.innerWidth;
+    if (this.isMobile && this.video) {
+      this._setMobileVideo();
+    }
+  }
+
+  _setMobileVideo() {
+    const sources = this.video.querySelectorAll('source');
+    sources.forEach(s => s.remove());
+
+    const webm = document.createElement('source');
+    webm.src = 'assets/video/hero-clip-mobile.webm';
+    webm.type = 'video/webm';
+
+    const mp4 = document.createElement('source');
+    mp4.src = 'assets/video/hero-clip-mobile.mp4';
+    mp4.type = 'video/mp4';
+
+    this.video.appendChild(webm);
+    this.video.appendChild(mp4);
+    this.video.removeAttribute('autoplay');
+    this.video.style.opacity = '0';
+    this.video.load();
+
+    // Hide hero branding until the delayed reveal
+    if (this.heroLogo) this.heroLogo.style.opacity = '0';
+    if (this.heroBrand) this.heroBrand.style.opacity = '0';
+    if (this.heroTagline) this.heroTagline.style.opacity = '0';
+  }
+
+  _startSurfboardBlend() {
+    const video = this.video;
+
+    // Clone the logo overlay with black text, positioned on top
+    const darkOverlay = this.heroLogo.cloneNode(true);
+    darkOverlay.removeAttribute('id');
+    darkOverlay.style.zIndex = '101';
+    const darkBrand = darkOverlay.querySelector('.brand');
+    const darkTagline = darkOverlay.querySelector('.tagline');
+    if (darkBrand) { darkBrand.style.color = '#000'; darkBrand.style.opacity = '1'; }
+    if (darkTagline) { darkTagline.style.color = '#000'; darkTagline.style.opacity = '1'; }
+    this.heroLogo.parentElement.appendChild(darkOverlay);
+
+    // Small canvas for the threshold mask — match viewport aspect ratio
+    const canvas = document.createElement('canvas');
+    const scale = 240 / window.innerWidth;
+    const w = 240;
+    const h = Math.round(window.innerHeight * scale);
+    canvas.width = w;
+    canvas.height = h;
+    const ctx = canvas.getContext('2d');
+    const minBright = 100;
+    const maxBright = 172;
+
+    const processFrame = () => {
+      if (video.ended || video.paused) {
+        darkOverlay.remove();
+        return;
+      }
+
+      ctx.drawImage(video, 0, 0, w, h);
+      const imageData = ctx.getImageData(0, 0, w, h);
+      const buf = new Uint32Array(imageData.data.buffer);
+      for (let i = 0; i < buf.length; i++) {
+        const px = buf[i];
+        const r = px & 0xFF;
+        const g = (px >> 8) & 0xFF;
+        const b = (px >> 16) & 0xFF;
+        const avg = (r + g + b) / 3;
+        // Opaque only in the brightness band where the surfboard lives
+        buf[i] = (avg >= minBright && avg <= maxBright) ? 0xFFFFFFFF : 0x00000000;
+      }
+      ctx.putImageData(imageData, 0, 0);
+
+      const url = canvas.toDataURL();
+      darkOverlay.style.webkitMaskImage = `url(${url})`;
+      darkOverlay.style.maskImage = `url(${url})`;
+      darkOverlay.style.webkitMaskSize = 'cover';
+      darkOverlay.style.maskSize = 'cover';
+
+      requestAnimationFrame(processFrame);
+    };
+    processFrame();
   }
 
   async init() {
     // Listen for skip event from scroll_physics
     window.addEventListener('skip-intro', () => this.skipIntro());
 
+    // If ?skip=true, skip the intro immediately
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('skip') === 'true') {
+      // Clean the URL without reloading
+      history.replaceState(null, '', window.location.pathname);
+      this.skipIntro();
+      return;
+    }
+
     // Safety timeout to ensure intro starts even if assets take too long
     const safety = setTimeout(() => this.startSequence(), 4000);
 
     try {
-      await Promise.allSettled([
+      const preloads = [
         this.audio.prefetch(),
         this.loader.preloadCritical([...COLLAGE_IMAGES, ...POST_VIDEO_PHOTOS, 'assets/images/medium/img_6967.jpg'])
-      ]);
+      ];
+
+      // On mobile, wait for video to buffer before starting
+      if (this.isMobile && this.video) {
+        preloads.push(new Promise(resolve => {
+          if (this.video.readyState >= 4) return resolve();
+          this.video.addEventListener('canplaythrough', resolve, { once: true });
+        }));
+      }
+
+      await Promise.allSettled(preloads);
     } catch (e) {
       console.warn('Intro preloading failed, starting anyway', e);
     }
@@ -79,16 +183,19 @@ class IntroSequence {
     
     // Show Main Branding
     if (this.heroBrand) this.heroBrand.style.opacity = '1';
-    
-    // Tagline (MEDIA) fades out gracefully then disappears permanently
+    if (this.heroLogo) this.heroLogo.style.opacity = '1';
+
+    // Tagline (MEDIA) — show it first, then fade out
     if (this.heroTagline) {
+      this.heroTagline.style.transition = 'none';
+      this.heroTagline.style.opacity = '1';
+      this.heroTagline.offsetHeight; // force reflow
       this.heroTagline.style.transition = 'opacity 1.5s ease';
       this.heroTagline.style.opacity = '0';
       setTimeout(() => {
         this.heroTagline.style.visibility = 'hidden';
       }, 1500);
-    } 
-    if (this.heroLogo) this.heroLogo.style.opacity = '1';
+    }
 
     // Dispatch immediately so hint timer can start in skip mode
     window.dispatchEvent(new CustomEvent('tagline-faded'));
@@ -151,31 +258,82 @@ class IntroSequence {
   }
 
   surgeUp() {
-    if (!this.logoContainer) return;
-    this.logoContainer.style.opacity = 0;
-    this.logoContainer.style.transform = 'translateY(-10px) scale(1.02)';
-    this.logoContainer.style.transition = 'transform 0.8s cubic-bezier(0.22, 1, 0.36, 1)';
+    if (!this.logoContainer || this.isSkipped) return;
 
-    setTimeout(() => { if(this.logoContainer) this.logoContainer.style.opacity = '1'; }, 50);
-    setTimeout(() => { if(this.logoContainer) this.logoContainer.style.opacity = '0'; }, 550);
-    setTimeout(() => { 
-      if(this.logoContainer) {
-        this.logoContainer.style.transition = 'none'; 
-        this.logoContainer.classList.add('negative-logo');
-        this.logoContainer.style.opacity = '1'; 
-      }
-    }, 750);
-    setTimeout(() => { if(this.logoContainer) this.logoContainer.style.opacity = '0'; }, 800);
-    
+    // On mobile, blur collage first, then cross-dissolve to video
+    if (this.isMobile && this.video) {
+      if (this.logoContainer) this.logoContainer.style.opacity = '0';
+      this.video.play().catch(() => {});
+
+      setTimeout(() => {
+        this.video.style.transition = 'opacity 0.8s ease';
+        this.video.style.opacity = '1';
+        this.overlay.style.transition = 'background-color 0.8s ease';
+        this.overlay.style.backgroundColor = 'transparent';
+      }, 200);
+
+      // Show OFFPOST logo 1.5s after video starts
+      setTimeout(() => {
+        if (this.heroLogo) {
+          this.heroLogo.style.transition = 'opacity 0.5s ease';
+          this.heroLogo.style.opacity = '1';
+        }
+        if (this.heroBrand) this.heroBrand.style.opacity = '1';
+        if (this.heroTagline) this.heroTagline.style.opacity = '1';
+      }, 1500);
+
+      // Last 3.4s: surfboard silhouette shows through the text
+      let blendStarted = false;
+      this.video.addEventListener('timeupdate', () => {
+        if (blendStarted) return;
+        const remaining = this.video.duration - this.video.currentTime;
+        if (remaining <= 3.4 && this.heroLogo) {
+          blendStarted = true;
+          this._startSurfboardBlend();
+        }
+      });
+    }
+
+    // Skip intro logo flicker on mobile
+    if (!this.isMobile) {
+      this.logoContainer.style.opacity = 0;
+      this.logoContainer.style.transform = 'translateY(-10px) scale(1.02)';
+      this.logoContainer.style.transition = 'transform 0.8s cubic-bezier(0.22, 1, 0.36, 1)';
+
+      setTimeout(() => { if(this.logoContainer) this.logoContainer.style.opacity = '1'; }, 50);
+      setTimeout(() => { if(this.logoContainer) this.logoContainer.style.opacity = '0'; }, 550);
+      setTimeout(() => {
+        if(this.logoContainer) {
+          this.logoContainer.style.transition = 'none';
+          this.logoContainer.classList.add('negative-logo');
+          this.logoContainer.style.opacity = '1';
+        }
+      }, 750);
+      setTimeout(() => { if(this.logoContainer) this.logoContainer.style.opacity = '0'; }, 800);
+    }
+
     const collage = this.overlay.querySelectorAll('.flash-img');
-    collage.forEach(el => {
-      el.style.transition = 'all 0.8s cubic-bezier(0.22, 1, 0.36, 1)';
-      el.style.filter = 'brightness(0.2) blur(10px)';
-      el.style.transform += ' translateY(-20px) scale(1.05)';
-    });
+    if (this.isMobile) {
+      // On mobile, blur first then fade out (video fades in after 350ms delay)
+      const frost = document.getElementById('frost-overlay');
+      if (frost) frost.remove();
+      collage.forEach(el => {
+        el.style.transition = 'filter 0.25s ease, opacity 0.5s ease 0.15s';
+        el.style.filter = 'blur(10px) brightness(0.3)';
+        el.style.opacity = '0';
+        setTimeout(() => { if (el.parentNode) el.remove(); }, 700);
+      });
+    } else {
+      collage.forEach(el => {
+        el.style.transition = 'all 0.8s cubic-bezier(0.22, 1, 0.36, 1)';
+        el.style.filter = 'brightness(0.2) blur(10px)';
+        el.style.transform += ' translateY(-20px) scale(1.05)';
+      });
+    }
   }
 
   slamDown() {
+    if (this.isSkipped) return;
     if (this.video) {
       // Safety trigger: Only fallback if it's really stuck (back to 5s for safety but checks state)
       const safetyTrigger = setTimeout(() => {
@@ -187,8 +345,14 @@ class IntroSequence {
 
       const startVisuals = () => {
         clearTimeout(safetyTrigger);
-        this.flash.classList.add('flash-active');
-        this.revealMainBranding(false);
+
+        if (this.isMobile) {
+          // No flash on mobile — video and logo already handled in surgeUp
+          this.revealMainBranding(false);
+        } else {
+          this.flash.classList.add('flash-active');
+          this.revealMainBranding(false);
+        }
       };
 
       // If already playing due to autoplay attribute, trigger visuals immediately
@@ -202,19 +366,38 @@ class IntroSequence {
         });
       }
 
-      this.video.addEventListener('ended', () => {
+      const onVideoEnd = () => {
+        if (this._videoEnded) return;
+        this._videoEnded = true;
         clearTimeout(safetyTrigger);
+        clearTimeout(videoTimeout);
         this.video.pause();
         this.video.style.opacity = '0';
-        
+
         if (this.heroBrand) this.heroBrand.style.opacity = '1';
-        if (this.heroTagline) this.heroTagline.style.opacity = '1';
-        
-        // Enable scroll immediately when video ends
+
+        if (this.isMobile) {
+          if (this.heroTagline) {
+            this.heroTagline.style.transition = 'opacity 1.5s ease';
+            this.heroTagline.style.opacity = '0';
+            setTimeout(() => { if (this.heroTagline) this.heroTagline.style.visibility = 'hidden'; }, 1500);
+          }
+          window.dispatchEvent(new CustomEvent('tagline-faded'));
+        } else {
+          if (this.heroTagline) this.heroTagline.style.opacity = '1';
+        }
+
         this._enableScroll();
-        
         setTimeout(() => this.showPostVideoPhotos(), 500);
-      }, { once: true });
+      };
+
+      this.video.addEventListener('ended', onVideoEnd, { once: true });
+
+      // Hard timeout: video duration + 2s buffer, or 15s max if duration unknown
+      const maxWait = (this.video.duration && isFinite(this.video.duration))
+        ? (this.video.duration * 1000) + 2000
+        : 15000;
+      const videoTimeout = setTimeout(onVideoEnd, maxWait);
     } else {
       this.handleVideoFailure();
     }
@@ -237,27 +420,33 @@ class IntroSequence {
       this.video.style.transform = 'translateY(0) scale(1)';
     }
 
-    // Branding reveal logic
-    if (this.heroLogo) {
-      this.heroLogo.style.opacity = '1';
-      this.heroLogo.style.zIndex = '50';
-      this.heroLogo.style.transition = 'none';
-      this.heroLogo.style.transform = 'translateY(-10px)'; // Match surgeUp height
-      
-      this.heroLogo.offsetHeight; // Force reflow
+    // Branding reveal logic — skip on mobile; logo appears after delay in startVisuals
+    if (!this.isMobile) {
+      if (this.heroLogo) {
+        this.heroLogo.style.opacity = '1';
+        this.heroLogo.style.zIndex = '50';
+        this.heroLogo.style.transition = 'none';
+        this.heroLogo.style.transform = 'translateY(-10px)'; // Match surgeUp height
 
-      this.heroLogo.style.transition = `opacity ${duration} ease, transform ${duration} ${timing}`;
-      this.heroLogo.style.transform = 'translateY(0)';
+        this.heroLogo.offsetHeight; // Force reflow
+
+        this.heroLogo.style.transition = `opacity ${duration} ease, transform ${duration} ${timing}`;
+        this.heroLogo.style.transform = 'translateY(0)';
+      }
+
+      if (this.heroBrand) this.heroBrand.style.opacity = '1';
+      if (this.heroTagline) this.heroTagline.style.opacity = '1';
+      else window.dispatchEvent(new CustomEvent('tagline-faded'));
     }
-
-    if (this.heroBrand) this.heroBrand.style.opacity = '1';
-    if (this.heroTagline) this.heroTagline.style.opacity = '1';
-    else window.dispatchEvent(new CustomEvent('tagline-faded'));
     
-    // Slight delay before hiding intro container to ensure seamless transition
-    setTimeout(() => {
+    // Hide intro logo container — immediately on mobile, slight delay on desktop
+    if (this.isMobile) {
       if (this.logoContainer) this.logoContainer.style.opacity = '0';
-    }, 100);
+    } else {
+      setTimeout(() => {
+        if (this.logoContainer) this.logoContainer.style.opacity = '0';
+      }, 100);
+    }
 
     // Clear initial collage smoothly
     const collage = this.overlay.querySelectorAll('.flash-img');
@@ -380,4 +569,21 @@ class IntroSequence {
 document.addEventListener('DOMContentLoaded', () => {
   window.introSequence = new IntroSequence();
   window.introSequence.init();
+
+  // Clicking any OFFPOST logo on the main page replays the intro
+  const navBrand = document.querySelector('.nav-brand');
+  const heroBrand = document.getElementById('hero-brand');
+
+  const replayIntro = (e) => {
+    e.preventDefault();
+    // Reload without skip param to play the full intro
+    window.location.href = window.location.pathname;
+  };
+
+  if (navBrand) navBrand.addEventListener('click', replayIntro);
+  if (heroBrand) {
+    heroBrand.style.cursor = 'pointer';
+    heroBrand.style.pointerEvents = 'auto';
+    heroBrand.addEventListener('click', replayIntro);
+  }
 });

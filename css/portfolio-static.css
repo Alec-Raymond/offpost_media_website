@@ -168,7 +168,7 @@ body {
   :root { --cols: 2; }
 }
 @media (max-width: 768px) {
-  :root { --cols: 2; }
+  :root { --cols: 1; }
   .album-grid {
     padding: 1rem 0.5rem 0;
     gap: 0.5rem;
