@@ -291,14 +291,13 @@ class HorizontalScroll {
           }
 
           // Scale up the nav brand, anchored from the left
-          const scale = 1 + progress * 2;
+          const scale = 1 + progress * 0.5;
           // Tighten letter-spacing as it scales up
           const spacing = 0.3 - progress * 0.2;
           if (progress > 0) {
             navBrand.style.letterSpacing = `${spacing}em`;
             navBrand.style.transformOrigin = 'left center';
-            const yShift = window.innerWidth < 768 ? 3 : 2;
-            navBrand.style.transform = `translateX(-${totalRevealedWidth * 0.2}px) translateY(${progress * yShift}rem) scale(${scale})`;
+            navBrand.style.transform = `translateX(-${totalRevealedWidth * 0.2}px) scale(${scale})`;
             navBrand.style.pointerEvents = 'none';
           } else {
             navBrand.style.letterSpacing = '';

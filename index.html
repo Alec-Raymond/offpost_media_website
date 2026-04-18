@@ -8,7 +8,7 @@
   <!-- Preload critical fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400&family=Oswald:wght@300;400;500;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="css/main.css">
   <link rel="stylesheet" href="css/intro.css">
@@ -48,12 +48,12 @@
       <section id="about-panel" class="panel panel--about">
         <div class="about-content">
           <div class="about-rule"></div>
-          <p>I'm a Santa Cruz-based photographer and videographer. For the past six years, I've learned to caputure the stoke and emotion of fleeting moments. My approach is rooted in patience and timing: to find the frame that captures the energy of the moment. Whether its a rugged break of Northern California, a sick concert, or a send in the Sierras, I'll tell your story.</p>
+          <p>I'm a Santa Cruz-based photographer and videographer. For the past six years, I've learned to caputure the stoke and emotion of fleeting moments. My approach is rooted in patience and timing: to find the frame that captures the energy of the moment. If its a rugged break of northern california, a sick concert, or a send in the sierras, I'll tell your story.</p>
           <p>Available for freelance work, editorial projects, event coverage, and commercial commissions.</p>
-          <p class="about-name">GAGE ROHRBACKER</p>
+          <p class="about-name"><span>GAGE ROHRBACKER</span></p>
           <img src="assets/images/about_image.jpeg" class="about-image" alt="Gage Rohrbacker — Offpost Media">
-          <a href="mailto:offpostmedia@gmail.com" class="about-email">offpostmedia@gmail.com</a>
         </div>
+        <div id="about-email-zone" class="about-email-zone" aria-hidden="false"></div>
         <a href="https://www.linkedin.com/in/alec-raymond-007877211/" target="_blank" rel="noopener" class="about-credit">Designed by Alec Raymond</a>
       </section>
 
@@ -178,5 +178,121 @@
 
   <script type="module" src="js/intro.js"></script>
   <script type="module" src="js/scroll_physics.js"></script>
+  <script>
+    (function aboutEmailRain() {
+      const zone = document.getElementById('about-email-zone');
+      const panel = document.getElementById('about-panel');
+      if (!zone || !panel) return;
+      const MAILTO = 'mailto:offpostmedia@gmail.com';
+      const TEXT = 'offpostmedia@gmail.com';
+      const rand = (min, max) => Math.random() * (max - min) + min;
+
+      function updateZoneBounds() {
+        const img = panel.querySelector('.about-image');
+        const credit = panel.querySelector('.about-credit');
+        if (!img) return;
+        const panelRect = panel.getBoundingClientRect();
+        const imgRect = img.getBoundingClientRect();
+        const topPx = Math.max(0, imgRect.bottom - panelRect.top + 8);
+        let bottomPx = 32;
+        if (credit) {
+          const creditRect = credit.getBoundingClientRect();
+          bottomPx = Math.max(0, panelRect.bottom - creditRect.top + 8);
+        }
+        zone.style.top = `${topPx}px`;
+        zone.style.bottom = `${bottomPx}px`;
+      }
+
+      updateZoneBounds();
+      window.addEventListener('resize', updateZoneBounds);
+      // Image may not have finished loading when we measured — recompute on load
+      const aboutImg = panel.querySelector('.about-image');
+      if (aboutImg && !aboutImg.complete) aboutImg.addEventListener('load', updateZoneBounds);
+
+      function makeButton() {
+        const a = document.createElement('a');
+        a.href = MAILTO;
+        a.className = 'about-email';
+        a.textContent = TEXT;
+        return a;
+      }
+
+      function chooseCount() {
+        const r = Math.random();
+        if (r < 0.01) return 3;
+        if (r < 0.11) return 2;
+        return 1;
+      }
+
+      // Measure button size once (to approximate overlap avoidance)
+      const probe = makeButton();
+      probe.style.visibility = 'hidden';
+      probe.style.opacity = '0';
+      probe.style.left = '0';
+      probe.style.top = '0';
+      zone.appendChild(probe);
+      const probeRect = probe.getBoundingClientRect();
+      const BTN_W = probeRect.width || 280;
+      const BTN_H = probeRect.height || 28;
+      probe.remove();
+
+      function pickNonOverlappingPositions(count, zoneRect) {
+        const PAD = 12; // extra gap between buttons
+        const placements = [];
+        const maxAttempts = 200;
+        for (let i = 0; i < count; i++) {
+          let placed = false;
+          for (let a = 0; a < maxAttempts && !placed; a++) {
+            const halfW = BTN_W / 2;
+            const halfH = BTN_H / 2;
+            const cx = rand(halfW + 4, zoneRect.width - halfW - 4);
+            const cy = rand(halfH + 4, zoneRect.height - halfH - 4);
+            const hit = placements.some(p =>
+              Math.abs(p.cx - cx) < BTN_W + PAD &&
+              Math.abs(p.cy - cy) < BTN_H + PAD
+            );
+            if (!hit) {
+              placements.push({ cx, cy });
+              placed = true;
+            }
+          }
+        }
+        return placements;
+      }
+
+      function spawnCycle() {
+        const count = chooseCount();
+        const zoneRect = zone.getBoundingClientRect();
+        const placements = pickNonOverlappingPositions(count, zoneRect);
+        let longestTotal = 0;
+
+        placements.forEach(p => {
+          const btn = makeButton();
+          const fade = rand(1.8, 3.2); // seconds, slightly different per button
+          const hold = rand(2, 4);
+          btn.style.transition = `opacity ${fade}s ease-in-out`;
+          btn.style.left = `${p.cx}px`;
+          btn.style.top = `${p.cy}px`;
+          zone.appendChild(btn);
+
+          requestAnimationFrame(() => {
+            requestAnimationFrame(() => { btn.style.opacity = '1'; });
+          });
+
+          setTimeout(() => {
+            btn.style.opacity = '0';
+            setTimeout(() => btn.remove(), fade * 1000 + 200);
+          }, (fade + hold) * 1000);
+
+          const total = (fade * 2 + hold) * 1000;
+          if (total > longestTotal) longestTotal = total;
+        });
+
+        setTimeout(spawnCycle, longestTotal);
+      }
+
+      spawnCycle();
+    })();
+  </script>
 </body>
 </html>

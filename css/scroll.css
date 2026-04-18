@@ -226,9 +226,11 @@ body.scroll-enabled {
   width: 100%;
   max-width: min(35rem, calc(100vw - 1.5rem));
   text-align: left;
-  transform-origin: left center;
+  transform-origin: left top;
   transform: scale(min(1, calc(100vh / 900)));
   position: relative;
+  align-self: flex-start;
+  margin-top: 2vh;
 }
 
 .about-rule {
@@ -239,43 +241,62 @@ body.scroll-enabled {
 }
 
 .about-content p {
-  font-family: var(--font-body);
-  font-weight: 300;
-  font-size: 1rem;
-  line-height: 1.7;
-  color: rgba(255,255,255,0.7);
-  margin: 0 0 0.8rem;
-  letter-spacing: 0.02em;
+  font-family: 'Crimson Pro', Georgia, serif;
+  font-weight: 400;
+  font-size: 1.17rem;
+  line-height: 1.5;
+  color: rgba(255,255,255,0.82);
+  margin: 0 0 1rem;
+  letter-spacing: 0.05em;
 }
 
 .about-name {
   font-family: var(--font-display) !important;
-  font-weight: 400 !important;
+  font-weight: 700 !important;
   font-size: 1rem !important;
   letter-spacing: 0.2em !important;
-  color: var(--color-text) !important;
-  margin-bottom: 1rem !important;
-  text-align: right;
+  line-height: 1 !important;
+  margin: 0 !important;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.about-name span {
+  display: block;
+  color: #000;
+  background: #fff;
+  padding: 0.2em 0.5em;
 }
 
 .about-image {
+  display: block;
   width: 100%;
   height: auto;
-  margin-top: 0.5rem;
+  margin-top: 0;
   margin-bottom: 0;
   border: 4px solid #fff;
 }
 
+.about-email-zone {
+  position: absolute;
+  left: 2rem;
+  right: 0.75rem;
+  pointer-events: none;
+  z-index: 2;
+}
+
 .about-email {
-  display: block;
-  text-align: center;
-  font-size: 1.4rem;
-  color: #fff;
+  position: absolute;
+  font-size: 1.2rem;
+  color: rgba(255,255,255,0.82);
   text-decoration: none;
   font-family: var(--font-display);
   letter-spacing: 0.1em;
-  margin-top: 2rem;
   text-transform: uppercase;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: auto;
+  transform: translate(-50%, -50%);
   transition: color 0.3s;
 }
 
